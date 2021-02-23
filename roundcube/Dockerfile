@@ -50,7 +50,7 @@ RUN set -ex; \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )"; \
-    apk add --virtual .phpmyadmin-rundeps $runDeps; \
+    apk add --no-cache --virtual .phpmyadmin-rundeps $runDeps; \
     apk del --no-network .build-deps; \
     { \
         echo 'opcache.memory_consumption=128'; \
@@ -105,6 +105,7 @@ RUN set -ex; \
         roundcube.tar.gz \
         roundcube.tar.gz.asc \
         /usr/src/roundcubemail/installer \
+        /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*;
 
