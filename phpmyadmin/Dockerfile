@@ -38,7 +38,7 @@ RUN set -ex; \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )"; \
-    apk add --virtual .phpmyadmin-rundeps $runDeps; \
+    apk add --no-cache --virtual .phpmyadmin-rundeps $runDeps; \
     apk del --no-network .build-deps; \
     { \
         echo 'opcache.memory_consumption=128'; \
@@ -91,6 +91,7 @@ RUN set -ex; \
         /usr/src/phpmyadmin/test \
         /usr/src/phpmyadmin/composer.json \
         /usr/src/phpmyadmin/RELEASE-DATE-$VERSION \
+        /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*;
 
