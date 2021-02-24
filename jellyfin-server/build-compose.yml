@@ -1,0 +1,6 @@
+services:
+    jellyfin-server:
+        build: .
+        container_name: jellyfin-server
+        environment:
+            - TZ=Europe/Madrid
