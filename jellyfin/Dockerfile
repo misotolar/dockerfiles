@@ -1,50 +1,6 @@
-ARG DOTNET_VERSION=3.1
 ARG ALPINE_VERSION=3.13
 
-FROM mcr.microsoft.com/dotnet/core/sdk:${DOTNET_VERSION}-alpine AS build
-
-ARG VERSION=10.6.4
-
-WORKDIR /build
-
-RUN set -ex; \
-    apk add --no-cache git; \
-    git clone --branch v${VERSION} --depth=1 -c advice.detachedHead=false https://github.com/jellyfin/jellyfin /build; \
-    dotnet publish \
-        --configuration Release \
-        --output=/build/dist \
-        --self-contained \
-        --runtime alpine-x64 \
-        "-p:GenerateDocumentationFile=false;DebugSymbols=false;DebugType=none" \
-        Jellyfin.Server
-
-FROM node:current-alpine AS build_web
-
-ARG VERSION=10.6.4
-
-WORKDIR /build
-
-RUN set -ex; \
-    apk add --no-cache \
-        alpine-sdk \
-        autoconf \
-        automake \
-        curl \
-        g++ \
-        gcc \
-        gifsicle \
-        git \
-        libtool \
-        make \
-        musl-dev \
-        nasm \
-        python2 \
-        zlib \
-        zlib-dev; \
-        git clone --branch v${VERSION} --depth=1 -c advice.detachedHead=false https://github.com/jellyfin/jellyfin-web /build; \
-        yarn install;
-
-FROM alpine:${ALPINE_VERSION} as build_ffmpeg
+FROM alpine:${ALPINE_VERSION} as build
 
 ARG FFMPEG_VERSION=4.3.1
 ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"
@@ -114,7 +70,7 @@ RUN set -ex; \
     echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
     apk add --no-cache \
         gcc \
-        musl;
+        musl
 
 WORKDIR /tmp/libmfx
 
@@ -125,7 +81,7 @@ RUN set -ex; \
     mkdir build; \
     cd build; \
     cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../; \
-    make -j $(nproc) && \
+    make -j $(nproc); \
     make -j $(nproc) install
 
 ENV CFLAGS="-O2 -pipe -march=x86-64 -mtune=generic"
@@ -189,29 +145,14 @@ RUN set -ex; \
     ./extractlibrary cplist /build; \
     cp --archive --parents --no-dereference /opt/intel /build
 
-FROM alpine:${ALPINE_VERSION}
+FROM misotolar/jellyfin-server:latest
 
 LABEL mantainer="michal@sotolar.com"
 
-ENV JELLYFIN_CONFIG_DIR=/config/config
-ENV JELLYFIN_DATA_DIR=/config/data
-ENV JELLYFIN_LOG_DIR=/config/log
-ENV JELLYFIN_CACHE_DIR=/config/cache
-ENV JELLYFIN_WEB_DIR=/usr/share/jellyfin-web
-ENV JELLYFIN_FFMPEG_PATH=/usr/local/bin/ffmpeg
-
 ENV LD_LIBRARY_PATH=/opt/intel/mediasdk/lib64:/usr/local/lib64:/usr/local/lib:/usr/lib:/lib
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 RUN set -ex; \
     apk add --no-cache --upgrade \
-        fontconfig \
-        gcompat \
-        icu-libs \
-        libssl1.1 \
-        libstdc++ \
-        libintl \
-        \
         libva-intel-driver \
         mesa-va-gallium \
         mesa-vdpau-gallium; \
@@ -219,13 +160,12 @@ RUN set -ex; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
     apk add --no-cache --upgrade \
         intel-media-driver \
-        libva-vdpau-driver;
+        libva-vdpau-driver; \
+    rm -rf \
+        /var/cache/apk/* \
+        /var/tmp/* \
+        /tmp/*
 
-COPY --from=build /build/dist /usr/lib/jellyfin
-COPY --from=build_web /build/dist /usr/share/jellyfin-web
-COPY --from=build_ffmpeg /build /
+COPY --from=build /build /
 
-EXPOSE 8096 8920 7359/udp 1900/udp
-VOLUME /config /media
-
-ENTRYPOINT /usr/lib/jellyfin/jellyfin --ffmpeg ${JELLYFIN_FFMPEG_PATH}
+ENTRYPOINT /usr/lib/jellyfin/jellyfin --ffmpeg /usr/local/bin/ffmpeg
