@@ -73,7 +73,7 @@ RUN set -ex; \
         gcc \
         musl
 
-WORKDIR /tmp/MEDIASDK
+WORKDIR /tmp/mediasdk
 
 RUN set -ex; \
     curl -fsSL -o mediasdk.tar.gz $MEDIASDK_URL; \
@@ -95,10 +95,13 @@ ENV CXXFLAGS="-O2 -pipe -march=x86-64 -mtune=generic"
 
 WORKDIR /tmp/ffmpeg
 
+ADD patches/jellyfin-ffmpeg/*.patch /tmp/ffmpeg/patches
+
 RUN set -ex; \
     curl -fsSL -o ffmpeg.tar.bz2 $FFMPEG_URL; \
     echo "$FFMPEG_SHA256  ffmpeg.tar.bz2" | sha256sum --status -c -; \
     tar xf ffmpeg.tar.bz2 --strip-components=1; \
+    cat patches/jellyfin-ffmpeg/*.patch | patch -p1
     ./configure \
         --disable-doc \
         --disable-debug \
