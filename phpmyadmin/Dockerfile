@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -93,7 +93,7 @@ RUN set -ex; \
         /usr/src/phpmyadmin/RELEASE-DATE-$VERSION \
         /var/cache/apk/* \
         /var/tmp/* \
-        /tmp/*;
+        /tmp/*
 
 COPY config.inc.php /etc/phpmyadmin/config.inc.php
 COPY entrypoint.sh /entrypoint.sh
