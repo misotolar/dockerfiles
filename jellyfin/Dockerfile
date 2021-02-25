@@ -1,14 +1,14 @@
 ARG ALPINE_VERSION=3.13
 
-FROM alpine:${ALPINE_VERSION} as build
+FROM alpine:$ALPINE_VERSION as build
 
 ARG FFMPEG_VERSION=4.3.1
 ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"
 ARG FFMPEG_SHA256=f4a4ac63946b6eee3bbdde523e298fca6019d048d6e1db0d1439a62cea65f0d9
 
-ARG LIBMFX_VERSION=20.5.1
-ARG LIBMFX_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$LIBMFX_VERSION.tar.gz"
-ARG LIBMFX_SHA256=047986646f185313df2159fd44bccd870e173bb1cae9c2501ac6b9774bfd424b
+ARG MEDIASDK_VERSION=20.5.1
+ARG MEDIASDK_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz"
+ARG MEDIASDK_SHA256=047986646f185313df2159fd44bccd870e173bb1cae9c2501ac6b9774bfd424b
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib64:/usr/local/lib64:/usr/local/lib:/usr/lib:/lib
 ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib64/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
@@ -73,15 +73,20 @@ RUN set -ex; \
         gcc \
         musl
 
-WORKDIR /tmp/libmfx
+WORKDIR /tmp/MEDIASDK
 
 RUN set -ex; \
-    curl -fsSL -o libmfx.tar.gz $LIBMFX_URL; \
-    echo "$LIBMFX_SHA256  libmfx.tar.gz" | sha256sum --status -c -; \
-    tar xf libmfx.tar.gz --strip-components=1; \
+    curl -fsSL -o mediasdk.tar.gz $MEDIASDK_URL; \
+    echo "$MEDIASDK_SHA256  mediasdk.tar.gz" | sha256sum --status -c -; \
+    tar xf mediasdk.tar.gz --strip-components=1; \
     mkdir build; \
     cd build; \
-    cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../; \
+    cmake \
+        -DCMAKE_BUILD_TYPE=MinSizeRel \
+        -DENABLE_X11=off \
+        -DBUILD_SAMPLES=off \
+        -DBUILD_TUTORIALS=off \
+        ../; \
     make -j $(nproc); \
     make -j $(nproc) install
 
@@ -123,19 +128,19 @@ RUN set -ex; \
         --enable-openssl \
         --enable-shared \
         --enable-version3 \
-        --extra-cflags="-I${PREFIX}/include ${CFLAGS}" \
-        --extra-cxxflags="-I${PREFIX}/include ${CXXFLAGS}" \
-        --extra-ldflags="-L${PREFIX}/lib" \
+        --extra-cflags="-I$PREFIX/include $CFLAGS" \
+        --extra-cxxflags="-I$PREFIX/include $CXXFLAGS" \
+        --extra-ldflags="-L$PREFIX/lib" \
         --extra-libs="-lpthread -lm" \
-        --prefix="${PREFIX}" \
+        --prefix="$PREFIX" \
         \
         --enable-libmfx \
         --enable-vaapi \
         --enable-vdpau \
         || (cat ffbuild/config.log ; false); \
-    mkdir -p /build${PREFIX}/bin/; \
+    mkdir -p /build$PREFIX/bin/; \
     make -j$(nproc) install tools/qt-faststart; \
-    cp tools/qt-faststart /build${PREFIX}/bin
+    cp tools/qt-faststart /build$PREFIX/bin
 
 WORKDIR /tmp/build
 
