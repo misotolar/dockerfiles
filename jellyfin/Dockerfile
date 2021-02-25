@@ -2,9 +2,9 @@ ARG ALPINE_VERSION=3.13
 
 FROM alpine:$ALPINE_VERSION as build
 
-ARG FFMPEG_VERSION=4.3.1
+ARG FFMPEG_VERSION=4.3.2
 ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"
-ARG FFMPEG_SHA256=f4a4ac63946b6eee3bbdde523e298fca6019d048d6e1db0d1439a62cea65f0d9
+ARG FFMPEG_SHA256=ab3a6d6a70358ba0a5f67f37f91f6656b7302b02e98e5b8c846c16763c99913a
 
 ARG MEDIASDK_VERSION=20.5.1
 ARG MEDIASDK_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz"
@@ -36,8 +36,6 @@ RUN set -ex; \
         cunit-dev \
         dav1d-dev \
         fdk-aac-dev \
-        ffmpeg-libs \
-        ffmpeg-dev \
         fontconfig-dev \
         freetype-dev \
         fribidi-dev \
@@ -66,6 +64,8 @@ RUN set -ex; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
     apk add --no-cache \
+        ffmpeg-libs \
+        ffmpeg-dev \
         intel-media-driver-dev \
         libva-vdpau-driver; \
     echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
