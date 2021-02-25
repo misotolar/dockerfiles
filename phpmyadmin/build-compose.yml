@@ -1,0 +1,6 @@
+services:
+    phpmyadmin:
+        build: .
+        container_name: phpmyadmin
+        environment:
+            - TZ=Europe/Madrid
