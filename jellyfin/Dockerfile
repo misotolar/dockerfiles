@@ -35,6 +35,7 @@ RUN set -ex; \
         \
         cunit-dev \
         dav1d-dev \
+        fdk-aac-dev \
         ffmpeg-libs \
         ffmpeg-dev \
         fontconfig-dev \
@@ -106,6 +107,7 @@ RUN set -ex; \
         --enable-libbluray \
         --enable-libdav1d \
         --enable-libdrm \
+        --enable-libfdk_aac \
         --enable-libfontconfig \
         --enable-libfreetype \
         --enable-libfribidi \
