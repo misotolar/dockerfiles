@@ -58,16 +58,13 @@ RUN set -ex; \
         \
         libva-dev \
         libva-intel-driver \
-        libvdpau-dev \
-        mesa-va-gallium \
-        mesa-vdpau-gallium; \
+        mesa-va-gallium; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
     apk add --no-cache \
         ffmpeg-libs \
         ffmpeg-dev \
-        intel-media-driver-dev \
-        libva-vdpau-driver; \
+        intel-media-driver-dev; \
     echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
     apk add --no-cache \
         gcc \
@@ -83,9 +80,9 @@ RUN set -ex; \
     cd build; \
     cmake \
         -DCMAKE_BUILD_TYPE=MinSizeRel \
-        -DENABLE_X11=off \
-        -DBUILD_SAMPLES=off \
-        -DBUILD_TUTORIALS=off \
+        -DENABLE_X11=OFF \
+        -DBUILD_SAMPLES=OFF \
+        -DBUILD_TUTORIALS=OFF \
         ../; \
     make -j $(nproc); \
     make -j $(nproc) install
@@ -139,7 +136,6 @@ RUN set -ex; \
         \
         --enable-libmfx \
         --enable-vaapi \
-        --enable-vdpau \
         || (cat ffbuild/config.log ; false); \
     mkdir -p /build$PREFIX/bin/; \
     make -j$(nproc) install tools/qt-faststart; \
@@ -164,13 +160,11 @@ ENV LD_LIBRARY_PATH=/opt/intel/mediasdk/lib64:/usr/local/lib64:/usr/local/lib:/u
 RUN set -ex; \
     apk add --no-cache --upgrade \
         libva-intel-driver \
-        mesa-va-gallium \
-        mesa-vdpau-gallium; \
+        mesa-va-gallium; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
     apk add --no-cache --upgrade \
-        intel-media-driver \
-        libva-vdpau-driver; \
+        intel-media-driver; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
