@@ -142,10 +142,9 @@ RUN set -ex; \
     cp tools/qt-faststart /build$PREFIX/bin
 
 WORKDIR /tmp/build
+COPY utility/extractlibrary /tmp/build/extractlibrary
 
 RUN set -ex; \
-    curl -fsSL -o extractlibrary https://raw.githubusercontent.com/collelog/ffmpeg/master/DockerTools/extractlibrary; \
-    chmod 755 extractlibrary; \
     echo /usr/local/bin/ffmpeg >> cplist; \
     echo /usr/local/bin/ffprobe >> cplist; \
     ./extractlibrary cplist /build; \
