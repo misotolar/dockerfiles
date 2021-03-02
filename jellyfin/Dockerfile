@@ -142,7 +142,7 @@ RUN set -ex; \
     cp tools/qt-faststart /build$PREFIX/bin
 
 WORKDIR /tmp/build
-COPY utility/extractlibrary /tmp/build/extractlibrary
+COPY utilities/extractlibrary /tmp/build/extractlibrary
 
 RUN set -ex; \
     echo /usr/local/bin/ffmpeg >> cplist; \
