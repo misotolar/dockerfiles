@@ -65,8 +65,8 @@ RUN set -ex; \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
         tzdata \
-        unixodbc-dev \
-        xterm; \
+        sudo \
+        unixodbc-dev; \
     pecl channel-update pecl.php.net; \
     echo "\n\n\n\n\n\n\n\n" | pecl install \
         dio-${PHP_DIO_VERSION} \
