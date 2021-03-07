@@ -45,6 +45,7 @@ RUN set -ex; \
         libevent-pthreads-2.1-6 \
         libevent-dev \
         locales \
+        minicom \
         msodbcsql17 \
         php-pear \
         php${PHP_VERSION}-bcmath \
