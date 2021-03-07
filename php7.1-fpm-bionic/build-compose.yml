@@ -1,0 +1,6 @@
+services:
+    php7.1-fpm-bionic:
+        build: .
+        container_name: php7.1-fpm-bionic
+        environment:
+            - TZ=Europe/Madrid
