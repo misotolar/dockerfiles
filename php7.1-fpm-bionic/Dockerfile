@@ -35,6 +35,7 @@ RUN set -ex; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
         ca-certificates \
+        coreutils \
         build-essential \
         curl \
         gettext-base \
