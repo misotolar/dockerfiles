@@ -35,10 +35,10 @@ RUN set -ex; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
         ca-certificates \
-        coreutils \
         build-essential \
         curl \
         gettext-base \
+        joe \
         libevent-2.1-6 \
         libevent-extra-2.1-6 \
         libevent-openssl-2.1-6 \
