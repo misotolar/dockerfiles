@@ -21,7 +21,9 @@ ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 RUN set -ex; \
     apt-get update -y; \
     apt-get install --no-install-recommends -y \
-        gnupg; \
+        gnupg \
+        locales; \
+    locale-gen "es_ES.UTF-8"; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
@@ -95,6 +97,10 @@ RUN set -ex; \
         /var/lib/apt/lists/* \
         /var/tmp/* \
         /tmp/*
+
+ENV LANG=es_ES.UTF-8
+ENV LANGUAGE=es_ES.UTF-8
+ENV LC_ALL=es_ES.UTF-8
 
 COPY php-fpm.conf /etc/php/${PHP_VERSION}/fpm/php-fpm.conf.docker
 COPY entrypoint.sh /entrypoint.sh
