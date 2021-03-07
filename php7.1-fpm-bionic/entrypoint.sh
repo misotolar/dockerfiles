@@ -20,9 +20,9 @@ if [ -n "$USER_VIDEO_GID" ]; then
     fi
 fi
 
-if ! id -u "$USER_NAME" > /dev/null 2>&1; then
-    adduser --quiet --disabled-password --uid "$USER_UID" --shell /bin/bash --home /home/"$USER_NAME" --gecos "$USER_GECOS" "$USER_NAME"
-    usermod -aG dialout,disk,video,sudo "$USER_NAME"
+if ! id -u "$PHP_USER" > /dev/null 2>&1; then
+    adduser --quiet --disabled-password --uid "$PHP_USER_UID" --shell /bin/bash --home /home/"$PHP_USER" --gecos "$PHP_USER_GECOS" "$PHP_USER"
+    usermod -aG dialout,disk,video,sudo "$PHP_USER"
 fi
 
 envsubst < "/etc/php/$PHP_VERSION/fpm/php-fpm.conf.docker" > "/etc/php/$PHP_VERSION/fpm/php-fpm.conf"
