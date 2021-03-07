@@ -64,7 +64,6 @@ RUN set -ex; \
         php${PHP_VERSION}-sqlite3 \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
-        ttf-mscorefonts-installer \
         tzdata \
         unixodbc-dev; \
     pecl channel-update pecl.php.net; \
