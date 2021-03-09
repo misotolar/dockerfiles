@@ -17,8 +17,9 @@ RUN set -ex; \
         libreoffice-writer \
         tzdata \
         unoconv; \
+    ln -fs /usr/bin/python3 /usr/local/bin/python; \
     curl -fsSL -o /usr/local/bin/unoconv ${URL}; \
-    chmod 755 /usr/bin/unoconv; \
+    chmod 755 /usr/local/bin/unoconv; \
     apt-get remove --purge -y \
         ca-certificates \
         curl; \
