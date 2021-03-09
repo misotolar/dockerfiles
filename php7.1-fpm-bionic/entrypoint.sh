@@ -1,6 +1,7 @@
 #!/bin/sh
 
 locale-gen
+fc-cache
 
 if [ -n "$USER_DISK_GID" ]; then
     if [ "$USER_DISK_GID" != $(getent group disk | cut -d: -f3) ]; then
@@ -28,4 +29,5 @@ if ! id -u "$PHP_USER" > /dev/null 2>&1; then
 fi
 
 envsubst < "/etc/php/php-fpm.conf" > "/etc/php/$PHP_VERSION/fpm/php-fpm.conf"
+
 exec "$@"
