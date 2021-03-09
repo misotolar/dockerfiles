@@ -22,22 +22,24 @@ ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 RUN set -ex; \
     apt-get update -y; \
     apt-get install --no-install-recommends -y \
+        ca-certificates \
         gnupg \
         locales; \
     locale-gen "es_ES.UTF-8"; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://download.docker.com/linux/debian buster stable" >> /etc/apt/sources.list; \
     echo "deb http://packages.microsoft.com/ubuntu/18.04/prod bionic main" >> /etc/apt/sources.list; \
     echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu bionic main" >> /etc/apt/sources.list; \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB3E94ADBE1229CF 4F4EA0AAE5267A6C; \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8 EB3E94ADBE1229CF 4F4EA0AAE5267A6C; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
-        ca-certificates \
         build-essential \
         cmake \
         curl \
+        docker-ce-cli \
         git \
         gettext-base \
         joe \
@@ -52,8 +54,6 @@ RUN set -ex; \
         libhidapi-dev \
         libhidapi-hidraw0 \
         libhidapi-libusb0 \
-        libreoffice-common \
-        libreoffice-writer \
         libv4l-0 \
         libv4l-dev \
         libv4lconvert0 \
@@ -81,7 +81,6 @@ RUN set -ex; \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
         tzdata \
-        unoconv \
         sudo \
         unixodbc-dev; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
