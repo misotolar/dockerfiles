@@ -27,5 +27,5 @@ if ! id -u "$PHP_USER" > /dev/null 2>&1; then
     usermod -aG dialout,disk,video,sudo "$PHP_USER"
 fi
 
-envsubst < "/etc/php/$PHP_VERSION/fpm/php-fpm.conf.docker" > "/etc/php/$PHP_VERSION/fpm/php-fpm.conf"
-/usr/sbin/php-fpm"$PHP_VERSION"
+envsubst < "/etc/php/php-fpm.conf" > "/etc/php/$PHP_VERSION/fpm/php-fpm.conf"
+exec "$@"

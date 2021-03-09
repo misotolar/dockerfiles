@@ -92,6 +92,7 @@ RUN set -ex; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
+    ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
     apt-get remove --purge -y build-essential libevent-dev php-pear unixodbc-dev; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
@@ -105,7 +106,9 @@ ENV LANG=es_ES.UTF-8
 ENV LANGUAGE=es_ES.UTF-8
 ENV LC_ALL=es_ES.UTF-8
 
-COPY php-fpm.conf /etc/php/${PHP_VERSION}/fpm/php-fpm.conf.docker
-COPY entrypoint.sh /entrypoint.sh
+COPY php-fpm.conf /etc/php/php-fpm.conf
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT /entrypoint.sh
+STOPSIGNAL SIGQUIT
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]
