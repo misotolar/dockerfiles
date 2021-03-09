@@ -45,6 +45,8 @@ RUN set -ex; \
         libevent-pthreads-2.1-6 \
         libevent-dev \
         libimage-exiftool-perl \
+        libreoffice-common \
+        libreoffice-writer \
         locales \
         minicom \
         msodbcsql17 \
@@ -68,6 +70,7 @@ RUN set -ex; \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
         tzdata \
+        unoconv \
         sudo \
         unixodbc-dev; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
@@ -94,7 +97,7 @@ RUN set -ex; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
-    apt-get remove --purge -y build-essential dpkg-dev libevent-dev php-pear unixodbc-dev; \
+    apt-get remove --purge -y curl build-essential dpkg-dev libevent-dev php-pear unixodbc-dev; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
