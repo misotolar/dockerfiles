@@ -44,6 +44,9 @@ RUN set -ex; \
         libevent-openssl-2.1-6 \
         libevent-pthreads-2.1-6 \
         libevent-dev \
+        libimage-exiftool-perl \
+        libreoffice-calc \
+        libreoffice-writer \
         locales \
         minicom \
         msodbcsql17 \
@@ -67,6 +70,7 @@ RUN set -ex; \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
         tzdata \
+        unoconv \
         sudo \
         unixodbc-dev; \
     pecl channel-update pecl.php.net; \
