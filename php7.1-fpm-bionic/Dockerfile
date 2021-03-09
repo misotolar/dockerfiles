@@ -37,6 +37,7 @@ RUN set -ex; \
         ca-certificates \
         build-essential \
         curl \
+        git \
         gettext-base \
         joe \
         libevent-2.1-6 \
@@ -44,6 +45,9 @@ RUN set -ex; \
         libevent-openssl-2.1-6 \
         libevent-pthreads-2.1-6 \
         libevent-dev \
+        libhidapi-dev \
+        libhidapi-hidraw0 \
+        libhidapi-libusb0 \
         libimage-exiftool-perl \
         libreoffice-common \
         libreoffice-writer \
@@ -98,7 +102,9 @@ RUN set -ex; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
-    apt-get remove --purge -y build-essential dpkg-dev libevent-dev php-pear unixodbc-dev; \
+    git clone https://github.com/darrylb123/usbrelay /tmp/usbrelay; \
+    cd /tmp/usbrelay; make; make install; \
+    apt-get remove --purge -y curl build-essential dpkg-dev git libevent-dev libhidapi-dev php-pear unixodbc-dev; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
