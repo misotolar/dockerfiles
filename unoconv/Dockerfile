@@ -4,6 +4,9 @@ LABEL maintainer="michal@sotolar.com"
 
 ARG URL=https://raw.githubusercontent.com/unoconv/unoconv/master/unoconv
 
+ARG DEBIAN_FRONTEND=noninteractive
+ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+
 RUN set -ex; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
