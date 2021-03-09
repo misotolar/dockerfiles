@@ -16,6 +16,7 @@ RUN set -ex; \
     apt-get install --no-install-recommends -y \
         ca-certificates \
         curl \
+        libreoffice-calc \
         libreoffice-common \
         libreoffice-writer \
         tzdata \
