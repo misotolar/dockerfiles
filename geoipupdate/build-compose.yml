@@ -1,0 +1,6 @@
+services:
+    geoipupdate:
+        build: .
+        container_name: geoipupdate
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
