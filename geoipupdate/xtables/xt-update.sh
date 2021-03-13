@@ -10,4 +10,3 @@ xt-build.pl -D "${GEOIPUPDATE_XT_DIR:-"/usr/share/xt_geoip"}"
 
 rm -rf "${TMPDIR}"
 exit 0
-unzip 
