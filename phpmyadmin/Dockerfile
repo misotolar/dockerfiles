@@ -96,9 +96,9 @@ RUN set -ex; \
         /tmp/*
 
 COPY config.inc.php /etc/phpmyadmin/config.inc.php
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 VOLUME /var/www/html
 
-ENTRYPOINT [ "/entrypoint.sh" ]
-CMD [ "php-fpm"]
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]
