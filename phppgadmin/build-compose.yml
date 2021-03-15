@@ -2,5 +2,5 @@ services:
     phppgadmin:
         build: .
         container_name: phppgadmin
-        environment:
-            - TZ=Europe/Madrid
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
