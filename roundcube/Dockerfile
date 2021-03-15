@@ -109,12 +109,12 @@ RUN set -ex; \
         /var/tmp/* \
         /tmp/*;
 
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 VOLUME /var/www/html
 VOLUME /var/roundcube/config
 VOLUME /var/roundcube/db
 VOLUME /tmp/roundcube
 
-ENTRYPOINT [ "/entrypoint.sh" ]
-CMD [ "php-fpm"]
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["php-fpm"]

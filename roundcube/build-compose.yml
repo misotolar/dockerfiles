@@ -1,0 +1,6 @@
+services:
+    roundcube:
+        build: .
+        container_name: roundcube
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
