@@ -81,7 +81,8 @@ RUN set -ex; \
         icu-libs \
         libssl1.1 \
         libstdc++ \
-        libintl; \
+        libintl \
+        tzdata;
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
