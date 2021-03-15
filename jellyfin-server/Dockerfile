@@ -82,7 +82,7 @@ RUN set -ex; \
         libssl1.1 \
         libstdc++ \
         libintl \
-        tzdata;
+        tzdata; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
