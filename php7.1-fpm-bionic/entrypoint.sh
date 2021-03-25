@@ -1,7 +1,6 @@
 #!/bin/sh
 
 locale-gen
-fc-cache -fv
 
 if [ -n "$USER_DISK_GID" ]; then
     if [ "$USER_DISK_GID" != $(getent group disk | cut -d: -f3) ]; then
