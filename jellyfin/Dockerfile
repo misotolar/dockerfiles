@@ -2,9 +2,9 @@ ARG ALPINE_VERSION=3.13
 
 FROM alpine:$ALPINE_VERSION as build
 
-ARG FFMPEG_VERSION=4.3.2
+ARG FFMPEG_VERSION=4.4
 ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"
-ARG FFMPEG_SHA256=ab3a6d6a70358ba0a5f67f37f91f6656b7302b02e98e5b8c846c16763c99913a
+ARG FFMPEG_SHA256=42093549751b582cf0f338a21a3664f52e0a9fbe0d238d3c992005e493607d0e
 
 ARG MEDIASDK_VERSION=21.1.3
 ARG MEDIASDK_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz"
@@ -98,7 +98,7 @@ RUN set -ex; \
     curl -fsSL -o ffmpeg.tar.bz2 $FFMPEG_URL; \
     echo "$FFMPEG_SHA256  ffmpeg.tar.bz2" | sha256sum --status -c -; \
     tar xf ffmpeg.tar.bz2 --strip-components=1; \
-    cat patches/*.patch | patch -p1; \
+    # cat patches/*.patch | patch -p1; \
     ./configure \
         --disable-doc \
         --disable-debug \
@@ -124,6 +124,7 @@ RUN set -ex; \
         --enable-libwebp \
         --enable-libx264 \
         --enable-libx265 \
+        --enable-lto \
         --enable-nonfree \
         --enable-openssl \
         --enable-shared \
