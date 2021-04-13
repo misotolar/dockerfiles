@@ -3,6 +3,7 @@ const NodeMediaServer = require('./');
 const config = {
     rtmp: {
         port: ${APP_RTMP_PORT},
+        host: '${APP_RTMP_HOST}',
         chunk_size: ${APP_RTMP_CHUNK_SIZE},
         gop_cache: ${APP_RTMP_GOP_CACHE},
         ping: ${APP_RTMP_PING},
@@ -10,6 +11,7 @@ const config = {
     },
     http: {
         port: ${APP_HTTP_PORT},
+        host: '${APP_HTTP_HOST}',
         mediaroot: './media',
         webroot: './www',
         allow_origin: '${APP_HTTP_ALLOW_ORIGIN}',
