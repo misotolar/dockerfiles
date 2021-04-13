@@ -1,0 +1,6 @@
+services:
+    node-media-server:
+        build: .
+        container_name: node-media-server
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
