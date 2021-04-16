@@ -17,6 +17,9 @@ ENV TESSERACT_URL https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT
 ENV OPENALPR_VERSION 6ead2fb8f72ac1929a2e04912c5795af0bf37761
 ENV OPENALPR_URL https://github.com/openalpr/openalpr.git
 
+ARG DEBIAN_FRONTEND=noninteractive
+ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+
 RUN set -ex; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
@@ -40,7 +43,8 @@ RUN set -ex; \
         liblog4cplus-1.1-9 \
         liblog4cplus-dev \
         libtool \
-        pkg-config; \
+        pkg-config \
+        tzdata; \
     mkdir -p /build/opencv; \
     curl -fsSL -o /build/opencv.tar.gz $OPENCV_URL; \
     echo "$OPENCV_SHA256  /build/opencv.tar.gz" | sha256sum --status -c -; \
