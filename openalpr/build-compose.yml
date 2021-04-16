@@ -1,0 +1,8 @@
+services:
+    openalpr:
+        build: .
+        container_name: openalpr
+        environment:
+            - TZ=Europe/Madrid
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
