@@ -31,7 +31,7 @@ RUN set -ex; \
     rm -rf \
         /usr/lib/libreoffice/share/config \
         /usr/lib/libreoffice/share/gallery \
-        /usr/share/dock
+        /usr/share/doc \
         /usr/share/icons \
         /usr/share/libreoffice/share/config \
         /var/lib/apt/lists/* \
