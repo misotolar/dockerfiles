@@ -17,10 +17,9 @@ RUN set -ex; \
         ca-certificates \
         curl \
         libreoffice-calc \
-        libreoffice-common \
         libreoffice-writer \
-        tzdata \
-        unoconv; \
+        python3-uno \
+        tzdata; \
     ln -fs /usr/bin/python3 /usr/local/bin/python; \
     curl -fsSL -o /usr/local/bin/unoconv ${URL}; \
     chmod 755 /usr/local/bin/unoconv; \
@@ -30,6 +29,8 @@ RUN set -ex; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
+        /usr/share/doc \
+        /usr/share/libreoffice/share/config/images_*.zip \
         /var/lib/apt/lists/* \
         /var/tmp/* \
         /tmp/*
