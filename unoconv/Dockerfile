@@ -29,8 +29,11 @@ RUN set -ex; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
-        /usr/share/doc \
-        /usr/share/libreoffice/share/config/images_*.zip \
+        /usr/lib/libreoffice/share/config \
+        /usr/lib/libreoffice/share/gallery \
+        /usr/share/dock
+        /usr/share/icons \
+        /usr/share/libreoffice/share/config \
         /var/lib/apt/lists/* \
         /var/tmp/* \
         /tmp/*
