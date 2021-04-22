@@ -32,7 +32,6 @@ RUN set -ex; \
         /usr/lib/libreoffice/share/config/* \
         /usr/lib/libreoffice/share/gallery/* \
         /usr/share/doc/* \
-        /usr/share/fonts/* \
         /usr/share/icons/* \
         /usr/share/libreoffice/share/config/* \
         /usr/share/man/* \
