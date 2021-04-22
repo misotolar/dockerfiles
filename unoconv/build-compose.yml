@@ -4,3 +4,5 @@ services:
         container_name: unoconv
         environment:
             - TZ=Europe/Madrid
+        volumes:
+            - /usr/share/fonts:/usr/share/fonts:ro
