@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -8,9 +8,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
 RUN set -ex; \
-    echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse" | tee /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu focal-security main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu focal-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
@@ -33,7 +33,7 @@ RUN set -ex; \
         /usr/lib/libreoffice/share/gallery \
         /usr/share/doc \
         /usr/share/icons \
-        /usr/share/libreoffice/share/config \
+        /usr/share/libreoffice/share/config/*.zip \
         /var/lib/apt/lists/* \
         /var/tmp/* \
         /tmp/*
