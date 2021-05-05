@@ -3,7 +3,7 @@ ARG ALPINE_VERSION=3.13
 
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}-alpine AS build
 
-ARG VERSION=10.7.2
+ARG VERSION=10.7.5
 ARG URL=https://github.com/jellyfin/jellyfin
 ARG DOTNET_CLI_TELEMETRY_OPTOUT=1
 
@@ -30,7 +30,7 @@ RUN set -ex; \
 
 FROM node:current-alpine AS build_web
 
-ARG VERSION=10.7.2
+ARG VERSION=10.7.5
 ARG URL=https://github.com/jellyfin/jellyfin-web
 
 WORKDIR /build
