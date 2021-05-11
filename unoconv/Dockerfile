@@ -18,8 +18,8 @@ RUN set -ex; \
         curl \
         libreoffice-calc \
         libreoffice-writer \
-        python3-uno \
-        tzdata; \
+        tzdata \
+        unoconv; \
     ln -fs /usr/bin/python3 /usr/local/bin/python; \
     curl -fsSL -o /usr/local/bin/unoconv ${URL}; \
     chmod 755 /usr/local/bin/unoconv; \
