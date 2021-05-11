@@ -2,7 +2,7 @@ ARG NODE_VERSION=10.24.1
 
 FROM node:${NODE_VERSION}-alpine
 
-ARG VERSION=69e9ea9b65092484b77bcfbee080cb1eefbaf20c
+ARG VERSION=d848533ea3b0c3940017ffe225c46a12c6a1ce1c
 ARG URL=https://github.com/misotolar/Node-Media-Server
 
 ENV APP_RTMP_PORT 1935
