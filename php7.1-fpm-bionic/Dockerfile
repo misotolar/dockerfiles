@@ -9,7 +9,7 @@ ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 7.1
 ENV PHP_VERSION_DATE 20160303
-ENV PHP_PACKAGE_VERSION 7.1.33-34
+ENV PHP_PACKAGE_VERSION 7.1.33-37
 
 ENV PHP_DIO_VERSION 0.2.0
 ENV PHP_EVENT_VERSION 3.0.2r1
@@ -39,6 +39,7 @@ RUN set -ex; \
         build-essential \
         cmake \
         curl \
+        cups-client \
         docker-ce-cli \
         git \
         gettext-base \
