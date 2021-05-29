@@ -53,6 +53,7 @@ RUN set -ex; \
         php${PHP_VERSION}-fpm \
         php${PHP_VERSION}-gd \
         php${PHP_VERSION}-interbase \
+        php${PHP_VERSION}-imagick \
         php${PHP_VERSION}-intl \
         php${PHP_VERSION}-json \
         php${PHP_VERSION}-ldap \
