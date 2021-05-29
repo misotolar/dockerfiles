@@ -9,7 +9,7 @@ ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 5.6
 ENV PHP_VERSION_DATE 20131226
-ENV PHP_PACKAGE_VERSION 5.6.40-47
+ENV PHP_PACKAGE_VERSION 5.6.40-50
 
 ENV PHP_DIO_VERSION 0.2.0
 ENV PHP_EVENT_VERSION 3.0.2r1
@@ -84,8 +84,10 @@ RUN set -ex; \
         build-essential \
         curl \
         dpkg-dev \
+        gnupg \
         libevent-dev \
-        php-pear; \
+        php-pear \
+        php${PHP_VERSION}-dev; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
