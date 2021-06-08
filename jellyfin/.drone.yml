@@ -1,0 +1,19 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+
+- name: publish
+  image: plugins/docker
+  settings:
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/jellyfin
+    dockerfile: jellyfin/Dockerfile
+    context: ./jellyfin
+    tags:
+      - ${DRONE_COMMIT_SHA:0:8}
+      - latest

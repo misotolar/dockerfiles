@@ -1,3 +1,4 @@
 geoipupdate/.drone.yml
+jellyfin/.drone.yml
 jellyfin-server/.drone.yml
 node-media-server/.drone.yml
