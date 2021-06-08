@@ -1,0 +1,29 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+
+- name: publish
+    image: plugins/docker
+    settings:
+        username: 
+            from_secret: DOCKER_USERNAME
+        password:
+            from_secret: DOCKER_PASSWORD
+        repo: misotolar/node-media-server
+        dockerfile: node-media-server/Dockerfile
+        context: ./node-media-server
+        tags:
+            - ${DRONE_COMMIT_SHA:0:7}
+            - latest
+
+- name: update
+    image: jlesage/drone-push-readme
+    settings:
+        username: 
+            from_secret: DOCKER_USERNAME
+        password:
+            from_secret: DOCKER_PASSWORD
+        repo: misotolar/node-media-server
+        readme: node-media-server/README.md
