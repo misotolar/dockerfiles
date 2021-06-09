@@ -19,7 +19,7 @@ steps:
       - latest
 
 - name: update
-  image: jlesage/drone-push-readme
+  image: misotolar/dockerhub-update
   settings: 
     username: 
       from_secret: DOCKER_USERNAME
@@ -27,3 +27,4 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/geoipupdate
     readme: geoipupdate/README.md
+    desc: "GeoIP Update schedule Alpine image with xt_geoip support"
