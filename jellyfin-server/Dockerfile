@@ -49,11 +49,11 @@ RUN set -ex; \
         make \
         musl-dev \
         nasm \
-        python2 \
+        python3 \
         zlib \
         zlib-dev; \
     git clone --branch v$VERSION --depth=1 -c advice.detachedHead=false $URL /build; \
-    yarn install; \
+    npm ci --no-audit --unsafe-perm; \
     apk del --no-network .build-deps; \
     mv /build/dist /dist; \
     rm -rf \
