@@ -11,9 +11,9 @@ steps:
       from_secret: DOCKER_USERNAME
     password:
       from_secret: DOCKER_PASSWORD
-    repo: misotolar/geoipupdate
-    dockerfile: geoipupdate/Dockerfile
-    context: ./geoipupdate
+    repo: misotolar/phppgadmin
+    dockerfile: phppgadmin/Dockerfile
+    context: ./phppgadmin
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
       - latest
