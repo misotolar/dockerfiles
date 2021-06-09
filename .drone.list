@@ -5,3 +5,4 @@ node-media-server/.drone.yml
 openalpr/.drone.yml
 php5.6-fpm-bionic/.drone.yml
 php7.1-fpm-bionic/.drone.yml
+php7.4-fpm-buster/.drone.yml
