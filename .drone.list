@@ -1,3 +1,4 @@
+dockerhub-update/.drone.yml
 geoipupdate/.drone.yml
 jellyfin/.drone.yml
 jellyfin-server/.drone.yml
