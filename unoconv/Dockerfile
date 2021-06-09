@@ -32,9 +32,6 @@ RUN set -ex; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
-        /usr/lib/libreoffice/share/config/* \
-        /usr/lib/libreoffice/share/gallery/* \
-        /usr/share/libreoffice/share/config/* \
         /usr/share/doc/* \
         /usr/share/icons/* \
         /usr/share/man/* \
