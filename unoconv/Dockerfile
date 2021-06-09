@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM debian:buster-slim
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -8,18 +8,21 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
 RUN set -ex; \
-    echo "deb http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse" | tee /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu focal-security main restricted universe multiverse" >> /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu focal-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://security.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
         ca-certificates \
         curl \
-        libreoffice-calc \
-        libreoffice-writer \
-        tzdata \
-        unoconv; \
+        tzdata; \
+    apt-get install -t buster-backports --no-install-recommends -y \
+        libreoffice-calc-nogui \
+        libreoffice-core-nogui \
+        libreoffice-writer-nogui \
+        python3-uno; \
     ln -fs /usr/bin/python3 /usr/local/bin/python; \
     curl -fsSL -o /usr/local/bin/unoconv ${URL}; \
     chmod 755 /usr/local/bin/unoconv; \
@@ -31,9 +34,9 @@ RUN set -ex; \
     rm -rf \
         /usr/lib/libreoffice/share/config/* \
         /usr/lib/libreoffice/share/gallery/* \
+        /usr/share/libreoffice/share/config/* \
         /usr/share/doc/* \
         /usr/share/icons/* \
-        /usr/share/libreoffice/share/config/* \
         /usr/share/man/* \
         /var/cache/debconf/* \
         /var/lib/apt/lists/* \

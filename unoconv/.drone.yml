@@ -27,4 +27,4 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/unoconv
     readme: unoconv/README.md
-    desc: "Unoconv Ubuntu LTS image"
+    desc: "Unoconv Debian Buster image"
