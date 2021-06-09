@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if git diff --name-only HEAD HEAD^ | grep -q "^php7.1-fpm-bionic/"; then
-    exit 0
-fi
-
-echo "Current build context not modified" 1>&2 ; exit 1
