@@ -17,3 +17,14 @@ steps:
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
       - latest
+
+- name: update
+  image: misotolar/dockerhub-update
+  settings: 
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/phppgadmin
+    readme: phppgadmin/README.md
+    desc: "phpPgAdmin Alpine FPM image"
