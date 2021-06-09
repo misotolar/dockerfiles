@@ -17,3 +17,14 @@ steps:
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
       - latest
+
+- name: update
+  image: misotolar/dockerhub-update
+  settings: 
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/php5.6-fpm-bionic
+    readme: php5.6-fpm-bionic/README.md
+    desc: "PHP 5.6 Ubuntu Bionic development FPM image"
