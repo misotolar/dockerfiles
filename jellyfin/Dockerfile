@@ -151,7 +151,7 @@ RUN set -ex; \
     ./extractlibrary cplist /build; \
     cp --archive --parents --no-dereference /opt/intel /build
 
-FROM misotolar/jellyfin-server:dff74232
+FROM misotolar/jellyfin-server:f219839a
 
 LABEL mantainer="michal@sotolar.com"
 
