@@ -1,0 +1,6 @@
+services:
+    janus-gateway:
+        build: .
+        container_name: janus-gateway
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
