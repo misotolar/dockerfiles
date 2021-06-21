@@ -6,6 +6,10 @@ ARG VERSION=0.11.3
 ARG SHA256=bfe4bb0f5c1db7ca1ab7e294b377d604b21e5187a35a64ed93536e2da9f0e9db
 ARG URL=https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz
 
+ARG BORINGSSL_VERSION=chromium-stable
+ARG BORINGSSL_SHA256=0cfe2da3bc9999b11d01220570c7b3e6c4eb5e85c28c229cea7412e41a0ef430
+ARG BORINGSSL_URL=https://github.com/google/boringssl/archive/refs/heads/${BORINGSSL_VERSION}.tar.gz
+
 ARG LIBNICE_VERSION=0.1.17
 ARG LIBNICE_SHA256=47f6b4f4fe2a606e795e06225540f838ad39fa01d7333b8d4f723297860ca8b6
 ARG LIBNICE_URL=https://github.com/libnice/libnice/archive/refs/tags/${LIBNICE_VERSION}.tar.gz
@@ -63,7 +67,9 @@ RUN set -ex; \
         openssl-dev \
         zlib-dev; \
     \
-    git clone https://github.com/google/boringssl.git .; \
+    curl -fsSL -o boringssl.tar.gz $BORINGSSL_URL; \
+    echo "$BORINGSSL_SHA256 *boringssl.tar.gz" | sha256sum -c -; \
+    tar -xf boringssl.tar.gz --strip-components=1; \
     sed -i s/" -Werror"//g CMakeLists.txt; \
     mkdir build; \
     cd build; \
