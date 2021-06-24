@@ -1,7 +1,7 @@
-diff -rupN ffmpeg-4.3.2.orig/libavformat/segment.c ffmpeg-4.3.2/libavformat/segment.c
---- ffmpeg-4.3.2.orig/libavformat/segment.c	2021-02-25 11:41:18.820987350 +0100
-+++ ffmpeg-4.3.2/libavformat/segment.c	2021-02-25 11:53:55.151170819 +0100
-@@ -86,6 +86,7 @@ typedef struct SegmentContext {
+diff -rupN ffmpeg-4.4.orig/libavformat/segment.c ffmpeg-4.4/libavformat/segment.c
+--- ffmpeg-4.4.orig/libavformat/segment.c	2021-04-08 22:55:16.000000000 +0200
++++ ffmpeg-4.4/libavformat/segment.c	2021-06-25 00:13:01.380492077 +0200
+@@ -87,6 +87,7 @@ typedef struct SegmentContext {
      int64_t last_val;      ///< remember last time for wrap around detection
      int cut_pending;
      int header_written;    ///< whether we've already called avformat_write_header
@@ -9,15 +9,15 @@ diff -rupN ffmpeg-4.3.2.orig/libavformat/segment.c ffmpeg-4.3.2/libavformat/segm
  
      char *entry_prefix;    ///< prefix to add to list entry filenames
      int list_type;         ///< set the list type
-@@ -701,6 +702,7 @@ static int seg_init(AVFormatContext *s)
+@@ -712,6 +713,7 @@ static int seg_init(AVFormatContext *s)
          if ((ret = parse_frames(s, &seg->frames, &seg->nb_frames, seg->frames_str)) < 0)
              return ret;
      } else {
 +        seg->start_pts = -1;
-         /* set default value if not specified */
-         if (!seg->time_str)
-             seg->time_str = av_strdup("2");
-@@ -903,7 +905,15 @@ calc_times:
+         if (seg->use_clocktime) {
+             if (seg->time <= 0) {
+                 av_log(s, AV_LOG_ERROR, "Invalid negative segment_time with segment_atclocktime option set\n");
+@@ -889,7 +891,15 @@ calc_times:
                  seg->cut_pending = 1;
              seg->last_val = wrapped_val;
          } else {

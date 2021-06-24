@@ -1,10 +1,6 @@
-# Fix for the broken tonemap_vaapi filter
-# avfilter/tonemap_vaapi: pass filter parameters to VA parameter buffer
-# avfilter: Add H2H support in tonemap_vaapi
-Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
-===================================================================
---- jellyfin-ffmpeg.orig/libavfilter/vf_tonemap_vaapi.c
-+++ jellyfin-ffmpeg/libavfilter/vf_tonemap_vaapi.c
+diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_vaapi.c ffmpeg-4.4/libavfilter/vf_tonemap_vaapi.c
+--- ffmpeg-4.4.orig/libavfilter/vf_tonemap_vaapi.c	2021-04-08 22:55:16.000000000 +0200
++++ ffmpeg-4.4/libavfilter/vf_tonemap_vaapi.c	2021-06-25 00:26:51.684218699 +0200
 @@ -41,7 +41,11 @@ typedef struct HDRVAAPIContext {
      enum AVColorTransferCharacteristic color_transfer;
      enum AVColorSpace color_matrix;

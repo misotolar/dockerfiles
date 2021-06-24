@@ -98,7 +98,7 @@ RUN set -ex; \
     curl -fsSL -o ffmpeg.tar.bz2 $FFMPEG_URL; \
     echo "$FFMPEG_SHA256  ffmpeg.tar.bz2" | sha256sum --status -c -; \
     tar xf ffmpeg.tar.bz2 --strip-components=1; \
-    # cat patches/*.patch | patch -p1; \
+    cat patches/*.patch | patch -p1; \
     ./configure \
         --disable-doc \
         --disable-debug \
