@@ -43,7 +43,6 @@ RUN set -ex; \
         docker-ce-cli \
         git \
         gettext-base \
-        ffmpeg \
         joe \
         libevent-2.1-6 \
         libevent-extra-2.1-6 \
