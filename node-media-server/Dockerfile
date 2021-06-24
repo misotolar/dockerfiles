@@ -30,6 +30,7 @@ RUN set -ex; \
     apk add --no-cache \
         bash \
         gettext \
+        ffmpeg \
         tzdata; \
     apk add --no-cache --virtual .fetch-deps \
         git; \
