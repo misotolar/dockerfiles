@@ -1,7 +1,7 @@
 diff -rupN ffmpeg-4.4.orig/libavfilter/allfilters.c ffmpeg-4.4/libavfilter/allfilters.c
---- ffmpeg-4.4.orig/libavfilter/allfilters.c	2021-04-08 22:55:16.000000000 +0200
-+++ ffmpeg-4.4/libavfilter/allfilters.c	2021-06-25 00:32:11.667495337 +0200
-@@ -414,6 +414,7 @@ extern AVFilter ff_vf_stereo3d;
+--- ffmpeg-4.4.orig/libavfilter/allfilters.c	2021-06-25 01:37:55.036242405 +0200
++++ ffmpeg-4.4/libavfilter/allfilters.c	2021-06-25 01:39:24.392795416 +0200
+@@ -415,6 +415,7 @@ extern AVFilter ff_vf_stereo3d;
  extern AVFilter ff_vf_streamselect;
  extern AVFilter ff_vf_subtitles;
  extern AVFilter ff_vf_super2xsai;
@@ -10,8 +10,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/allfilters.c ffmpeg-4.4/libavfilter/allfi
  extern AVFilter ff_vf_swapuv;
  extern AVFilter ff_vf_tblend;
 diff -rupN ffmpeg-4.4.orig/libavfilter/colorspace.c ffmpeg-4.4/libavfilter/colorspace.c
---- ffmpeg-4.4.orig/libavfilter/colorspace.c	2021-04-08 22:55:16.000000000 +0200
-+++ ffmpeg-4.4/libavfilter/colorspace.c	2021-06-25 00:34:02.317476784 +0200
+--- ffmpeg-4.4.orig/libavfilter/colorspace.c	2021-06-25 01:37:55.036242405 +0200
++++ ffmpeg-4.4/libavfilter/colorspace.c	2021-06-25 01:41:50.545942852 +0200
 @@ -17,6 +17,7 @@
   * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
   */
@@ -108,8 +108,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/colorspace.c ffmpeg-4.4/libavfilter/color
  {
      AVFrameSideData *sd = av_frame_get_side_data(in, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
 diff -rupN ffmpeg-4.4.orig/libavfilter/colorspace.h ffmpeg-4.4/libavfilter/colorspace.h
---- ffmpeg-4.4.orig/libavfilter/colorspace.h	2021-04-08 22:55:16.000000000 +0200
-+++ ffmpeg-4.4/libavfilter/colorspace.h	2021-06-25 00:34:43.090769727 +0200
+--- ffmpeg-4.4.orig/libavfilter/colorspace.h	2021-06-25 01:37:55.036242405 +0200
++++ ffmpeg-4.4/libavfilter/colorspace.h	2021-06-25 01:42:38.735889420 +0200
 @@ -45,8 +45,13 @@ void ff_fill_rgb2xyz_table(const struct
                             double rgb2xyz[3][3]);
  
@@ -125,8 +125,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/colorspace.h ffmpeg-4.4/libavfilter/color
  double ff_determine_signal_peak(AVFrame *in);
  void ff_update_hdr_metadata(AVFrame *in, double peak);
 diff -rupN ffmpeg-4.4.orig/libavfilter/Makefile ffmpeg-4.4/libavfilter/Makefile
---- ffmpeg-4.4.orig/libavfilter/Makefile	2021-04-08 22:55:16.000000000 +0200
-+++ ffmpeg-4.4/libavfilter/Makefile	2021-06-25 00:31:52.117498799 +0200
+--- ffmpeg-4.4.orig/libavfilter/Makefile	2021-06-25 01:37:55.032909075 +0200
++++ ffmpeg-4.4/libavfilter/Makefile	2021-06-25 01:38:50.626171698 +0200
 @@ -434,6 +434,7 @@ OBJS-$(CONFIG_STEREO3D_FILTER)
  OBJS-$(CONFIG_STREAMSELECT_FILTER)           += f_streamselect.o framesync.o
  OBJS-$(CONFIG_SUBTITLES_FILTER)              += vf_subtitles.o
@@ -137,7 +137,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/Makefile ffmpeg-4.4/libavfilter/Makefile
  OBJS-$(CONFIG_TBLEND_FILTER)                 += vf_blend.o framesync.o
 diff -rupN ffmpeg-4.4.orig/libavfilter/tonemap.h ffmpeg-4.4/libavfilter/tonemap.h
 --- ffmpeg-4.4.orig/libavfilter/tonemap.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/tonemap.h	2021-06-25 00:35:26.644059916 +0200
++++ ffmpeg-4.4/libavfilter/tonemap.h	2021-06-25 01:43:10.055862718 +0200
 @@ -0,0 +1,77 @@
 +/*
 + * Copyright (c) 2020 rcombs <rcombs@rcombs.me>
@@ -218,7 +218,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/tonemap.h ffmpeg-4.4/libavfilter/tonemap.
 +#endif /* AVFILTER_GRADFUN_H */
 diff -rupN ffmpeg-4.4.orig/libavfilter/vf_supertonemap.c ffmpeg-4.4/libavfilter/vf_supertonemap.c
 --- ffmpeg-4.4.orig/libavfilter/vf_supertonemap.c	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/vf_supertonemap.c	2021-06-25 00:42:40.593907585 +0200
++++ ffmpeg-4.4/libavfilter/vf_supertonemap.c	2021-06-25 01:47:02.088998226 +0200
 @@ -0,0 +1,736 @@
 +/*
 + * Copyright (c) 2017 Vittorio Giovara <vittorio.giovara@gmail.com>
