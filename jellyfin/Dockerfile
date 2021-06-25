@@ -56,19 +56,18 @@ RUN set -ex; \
         x264-dev \
         x265-dev \
         \
-        libva-dev \
         libva-intel-driver \
         mesa-va-gallium; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
+    echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
-    apk add --no-cache \
+    echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
+    apk add --no-cache --upgrade \
+        gcc \
         ffmpeg-libs \
         ffmpeg-dev \
-        intel-media-driver-dev; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
-    apk add --no-cache \
-        gcc \
-        musl
+        libva-dev \
+        intel-media-driver-dev \
+        musl;
 
 WORKDIR /tmp/mediasdk
 
@@ -124,7 +123,6 @@ RUN set -ex; \
         --enable-libwebp \
         --enable-libx264 \
         --enable-libx265 \
-        --enable-lto \
         --enable-nonfree \
         --enable-openssl \
         --enable-shared \
@@ -161,8 +159,8 @@ RUN set -ex; \
     apk add --no-cache --upgrade \
         libva-intel-driver \
         mesa-va-gallium; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
+    echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     apk add --no-cache --upgrade \
         intel-media-driver; \
     rm -rf \
