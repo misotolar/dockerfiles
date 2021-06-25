@@ -5,14 +5,19 @@ FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}-alpine AS build
 
 ARG VERSION=10.7.6
 ARG URL=https://github.com/jellyfin/jellyfin
+
 ARG DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 WORKDIR /build
 
+ADD patches/jellyfin/*.patch /tmp/patches/
+
 RUN set -ex; \
     apk add --no-cache --virtual .build-deps \
-        git; \
+        git \
+        patch; \
     git clone --branch v$VERSION --depth=1 -c advice.detachedHead=false $URL /build; \
+    cat /tmp/patches/*.patch | patch -p1; \
     dotnet publish \
         --configuration Release \
         --output=/build/dist \
