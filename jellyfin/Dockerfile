@@ -56,8 +56,7 @@ RUN set -ex; \
         x264-dev \
         x265-dev \
         \
-        libva-intel-driver \
-        mesa-va-gallium; \
+        libva-intel-driver; \
     echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
@@ -157,8 +156,7 @@ ENV LD_LIBRARY_PATH=/opt/intel/mediasdk/lib64:/usr/local/lib64:/usr/local/lib:/u
 
 RUN set -ex; \
     apk add --no-cache --upgrade \
-        libva-intel-driver \
-        mesa-va-gallium; \
+        libva-intel-driver; \
     echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     apk add --no-cache --upgrade \
