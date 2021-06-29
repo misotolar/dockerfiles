@@ -1,4 +1,5 @@
 dockerhub-update/.drone.yml
+fontello/.drone.yml
 geoipupdate/.drone.yml
 janus-gateway/.drone.yml
 jellyfin/.drone.yml

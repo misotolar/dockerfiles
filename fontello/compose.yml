@@ -1,0 +1,6 @@
+services:
+    fontello:
+        build: .
+        container_name: fontello
+        environment:
+            - TZ=Europe/Madrid
