@@ -57,8 +57,8 @@ RUN set -ex; \
 
 FROM node:14-buster-slim
 
-ENV FONTELLO_HOST=localhost
-ENV FONTELLO_PROTO=http
+LABEL mantainer="michal@sotolar.com"
+
 ENV NODECA_ENV=production
 
 WORKDIR /usr/local/fontello
