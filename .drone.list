@@ -1,3 +1,4 @@
+asterisk/.drone.yml
 dockerhub-update/.drone.yml
 fontello/.drone.yml
 geoipupdate/.drone.yml

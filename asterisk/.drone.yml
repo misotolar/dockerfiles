@@ -1,0 +1,30 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+
+- name: publish
+  image: plugins/docker
+  settings:
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/asterisk
+    dockerfile: asterisk/Dockerfile
+    context: ./asterisk
+    tags:
+      - ${DRONE_COMMIT_SHA:0:8}
+      - latest
+
+- name: update
+  image: misotolar/dockerhub-update
+  settings: 
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/asterisk
+    readme: asterisk/README.md
+    desc: "Asterisk Alpine image with MariaDB ODBC support"

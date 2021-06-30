@@ -1,0 +1,6 @@
+services:
+    asterisk:
+        build: .
+        container_name: asterisk
+        cap_add:
+            - NET_ADMIN
