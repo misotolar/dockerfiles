@@ -161,6 +161,7 @@ RUN set -ex; \
     rm -rf /build/*; \
     \
     ln -s /opt/janus/bin/janus /usr/local/bin/janus; \
+    mkdir -p /opt/janus/lib/janus/loggers; \
     mv /opt/janus/etc/janus /etc/; \
     \
     runDeps="$( \
