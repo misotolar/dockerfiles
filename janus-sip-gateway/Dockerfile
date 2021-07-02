@@ -148,13 +148,18 @@ RUN set -ex; \
     sh autogen.sh; \
     ./configure \
         --prefix=/opt/janus \
+        --disable-all-handlers \
+        --disable-all-plugins \
+        --disable-all-transports \
         --disable-docs \
-        --disable-gelf-event-handler \
-        --disable-sample-event-handler \
         --disable-unix-sockets \
         --enable-boringssl \
         --enable-dtls-settimeout \
-        --enable-post-processing; \
+        --enable-post-processing \
+        --enable-plugin-sip \
+        --enable-rest \
+        --enable-websockets \
+        ; \
     make; \
     make install; \
     make configs; \

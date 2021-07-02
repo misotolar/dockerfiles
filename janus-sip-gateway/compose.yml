@@ -1,6 +1,6 @@
 services:
-    janus-gateway:
+    janus-sip-gateway:
         build: .
-        container_name: janus-gateway
+        container_name: janus-sip-gateway
         volumes:
             - /etc/localtime:/etc/localtime:ro

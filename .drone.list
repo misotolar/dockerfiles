@@ -2,7 +2,7 @@ asterisk/.drone.yml
 dockerhub-update/.drone.yml
 fontello/.drone.yml
 geoipupdate/.drone.yml
-janus-gateway/.drone.yml
+janus-sip-gateway/.drone.yml
 jellyfin/.drone.yml
 jellyfin-server/.drone.yml
 node-media-server/.drone.yml

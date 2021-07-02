@@ -11,9 +11,9 @@ steps:
       from_secret: DOCKER_USERNAME
     password:
       from_secret: DOCKER_PASSWORD
-    repo: misotolar/janus-gateway
-    dockerfile: janus-gateway/Dockerfile
-    context: ./janus-gateway
+    repo: misotolar/janus-sip-gateway
+    dockerfile: janus-sip-gateway/Dockerfile
+    context: ./janus-sip-gateway
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
       - latest
@@ -25,6 +25,6 @@ steps:
       from_secret: DOCKER_USERNAME
     password:
       from_secret: DOCKER_PASSWORD
-    repo: misotolar/janus-gateway
-    readme: janus-gateway/README.md
-    desc: "Janus WebRTC Server Alpine image"
+    repo: misotolar/janus-sip-gateway
+    readme: janus-sip-gateway/README.md
+    desc: "Janus SIP Gateway Alpine image"
