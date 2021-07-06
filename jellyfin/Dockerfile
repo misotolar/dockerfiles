@@ -110,7 +110,7 @@ RUN set -ex; \
         --enable-libbluray \
         --enable-libdav1d \
         --enable-libdrm \
-        --enable-libfdk_aac \
+        --enable-libfdk-aac \
         --enable-libfontconfig \
         --enable-libfreetype \
         --enable-libfribidi \
