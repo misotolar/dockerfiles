@@ -62,6 +62,8 @@ RUN set -ex; \
         minicom \
         msodbcsql17 \
         php-pear \
+        php${PHP_VERSION}-apcu \
+        php${PHP_VERSION}-apcu-bc \
         php${PHP_VERSION}-bcmath \
         php${PHP_VERSION}-bz2 \
         php${PHP_VERSION}-cli \
