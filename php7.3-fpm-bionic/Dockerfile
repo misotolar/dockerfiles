@@ -86,25 +86,25 @@ RUN set -ex; \
         php${PHP_VERSION}-xml \
         tzdata \
         sassc \
-        sudo \
-        unixodbc-dev; \
+        sudo; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
     pecl channel-update pecl.php.net; \
     echo "\n\n\n\n\n\n\n\n" | pecl install \
         dio-${PHP_DIO_VERSION} \
-        event-${PHP_EVENT_VERSION} \
-        sqlsrv-${PHP_SQLSRV_VERSION} \
-        pdo_sqlsrv-${PHP_SQLSRV_VERSION}; \
+        event-${PHP_EVENT_VERSION}; \
     echo "extension = dio.so" | tee /etc/php/${PHP_VERSION}/mods-available/dio.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/dio.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-dio.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/dio.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-dio.ini; \
     echo "extension = event.so" | tee /etc/php/${PHP_VERSION}/mods-available/event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-event.ini; \
-    echo "extension = sqlsrv.so" | tee /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini; \
+    curl -fsSL -o /tmp/msphpsql.tar https://github.com/microsoft/msphpsql/releases/download/v${PHP_SQLSRV_VERSION}/Ubuntu1804-7.3.tar; \
+    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu1804-7.3/php_sqlsrv_73_nts.so; \
+    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu1804-7.3/php_pdo_sqlsrv_73_nts.so; \
+    echo "extension = php_sqlsrv_73_nts.so" | tee /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sqlsrv.ini; \
-    echo "extension = pdo_sqlsrv.so" | tee /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini; \
+    echo "extension = php_pdo_sqlsrv_73_nts.so" | tee /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-pdo_sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-pdo_sqlsrv.ini; \
     curl -fsSL -o /tmp/sourceguardian.tar.gz http://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz; \
@@ -116,6 +116,8 @@ RUN set -ex; \
     cd /tmp/mjpg-streamer/mjpg-streamer-experimental; make USE_LIBV4L2=true all; make install; \
     git clone https://github.com/darrylb123/usbrelay /tmp/usbrelay; \
     cd /tmp/usbrelay; make; make install; \
+    php -v; \
+    php -m; \
     apt-get remove --purge -y \
         build-essential \
         cmake \
@@ -125,8 +127,7 @@ RUN set -ex; \
         libevent-dev \
         libv4l-dev \
         linux-libc-dev \
-        php-pear \
-        unixodbc-dev; \
+        php-pear; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
