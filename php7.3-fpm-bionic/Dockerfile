@@ -98,9 +98,9 @@ RUN set -ex; \
     echo "extension = event.so" | tee /etc/php/${PHP_VERSION}/mods-available/event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-event.ini; \
-    curl -fsSL -o /tmp/msphpsql.tar https://github.com/microsoft/msphpsql/releases/download/v${PHP_SQLSRV_VERSION}/Ubuntu1804-7.3.tar; \
-    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu1804-7.3/php_sqlsrv_73_nts.so; \
-    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu1804-7.3/php_pdo_sqlsrv_73_nts.so; \
+    curl -fsSL -o /tmp/msphpsql.tar https://github.com/microsoft/msphpsql/releases/download/v${PHP_SQLSRV_VERSION}/Ubuntu1804-${PHP_VERSION}.tar; \
+    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu1804-${PHP_VERSION}/php_sqlsrv_73_nts.so; \
+    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu1804-${PHP_VERSION}/php_pdo_sqlsrv_73_nts.so; \
     echo "extension = php_sqlsrv_73_nts.so" | tee /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sqlsrv.ini; \
@@ -116,8 +116,6 @@ RUN set -ex; \
     cd /tmp/mjpg-streamer/mjpg-streamer-experimental; make USE_LIBV4L2=true all; make install; \
     git clone https://github.com/darrylb123/usbrelay /tmp/usbrelay; \
     cd /tmp/usbrelay; make; make install; \
-    php -v; \
-    php -m; \
     apt-get remove --purge -y \
         build-essential \
         cmake \
