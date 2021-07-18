@@ -118,16 +118,12 @@ RUN set -ex; \
         build-essential \
         cmake \
         curl \
-        dpkg-dev \
         git \
         gnupg \
         libevent-dev \
-        libjpeg8-dev \
-        libhidapi-dev \
         libv4l-dev \
-        php-pear \
-        php${PHP_VERSION}-dev \
-        unixodbc-dev; \
+        linux-libc-dev \
+        php-pear; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
