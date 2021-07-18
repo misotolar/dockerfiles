@@ -84,25 +84,25 @@ RUN set -ex; \
         php${PHP_VERSION}-xml \
         tzdata \
         sassc \
-        sudo \
-        unixodbc-dev; \
+        sudo; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
     pecl channel-update pecl.php.net; \
     echo "\n\n\n\n\n\n\n\n" | pecl install \
         dio-${PHP_DIO_VERSION} \
-        event-${PHP_EVENT_VERSION} \
-        sqlsrv-${PHP_SQLSRV_VERSION} \
-        pdo_sqlsrv-${PHP_SQLSRV_VERSION}; \
+        event-${PHP_EVENT_VERSION}; \
     echo "extension = dio.so" | tee /etc/php/${PHP_VERSION}/mods-available/dio.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/dio.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-dio.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/dio.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-dio.ini; \
     echo "extension = event.so" | tee /etc/php/${PHP_VERSION}/mods-available/event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-event.ini; \
-    echo "extension = sqlsrv.so" | tee /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini; \
+    curl -fsSL -o /tmp/msphpsql.tar https://github.com/microsoft/msphpsql/releases/download/v${PHP_SQLSRV_VERSION}/Ubuntu18-${PHP_VERSION}.tar; \
+    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu18-${PHP_VERSION}/php_sqlsrv_71_nts.so; \
+    echo "extension = php_sqlsrv_71_nts.so" | tee /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sqlsrv.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sqlsrv.ini; \
-    echo "extension = pdo_sqlsrv.so" | tee /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini; \
+    tar --extract --file=/tmp/msphpsql.tar --strip-components=1 --directory /usr/lib/php/${PHP_VERSION_DATE} Ubuntu18-${PHP_VERSION}/php_pdo_sqlsrv_71_nts.so; \
+    echo "extension = php_pdo_sqlsrv_71_nts.so" | tee /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-pdo_sqlsrv.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/pdo_sqlsrv.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-pdo_sqlsrv.ini; \
     curl -fsSL -o /tmp/sourceguardian.tar.gz http://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz; \
