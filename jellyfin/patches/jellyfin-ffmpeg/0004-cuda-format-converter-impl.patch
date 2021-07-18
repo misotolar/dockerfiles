@@ -1,6 +1,6 @@
 diff -rupN ffmpeg-4.4.orig/compat/cuda/cuda_runtime.h ffmpeg-4.4/compat/cuda/cuda_runtime.h
---- ffmpeg-4.4.orig/compat/cuda/cuda_runtime.h	2021-06-25 01:02:34.843710038 +0200
-+++ ffmpeg-4.4/compat/cuda/cuda_runtime.h	2021-06-25 01:14:01.677069930 +0200
+--- ffmpeg-4.4.orig/compat/cuda/cuda_runtime.h	2021-07-17 18:11:54.112732178 +0200
++++ ffmpeg-4.4/compat/cuda/cuda_runtime.h	2021-07-17 18:26:36.047513280 +0200
 @@ -49,16 +49,6 @@ typedef struct __device_builtin__ __alig
      unsigned short x, y;
  } ushort2;
@@ -126,8 +126,8 @@ diff -rupN ffmpeg-4.4.orig/compat/cuda/cuda_runtime.h ffmpeg-4.4/compat/cuda/cud
 -
  #endif /* COMPAT_CUDA_CUDA_RUNTIME_H */
 diff -rupN ffmpeg-4.4.orig/configure ffmpeg-4.4/configure
---- ffmpeg-4.4.orig/configure	2021-06-25 01:02:34.843710038 +0200
-+++ ffmpeg-4.4/configure	2021-06-25 01:14:34.677077242 +0200
+--- ffmpeg-4.4.orig/configure	2021-07-17 18:11:54.079398662 +0200
++++ ffmpeg-4.4/configure	2021-07-17 18:27:13.624382034 +0200
 @@ -6251,7 +6251,7 @@ fi
  if enabled cuda_nvcc; then
      nvccflags="$nvccflags -ptx"
@@ -138,7 +138,7 @@ diff -rupN ffmpeg-4.4.orig/configure ffmpeg-4.4/configure
  fi
  
 diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/vector_helpers.cuh ffmpeg-4.4/libavfilter/cuda/vector_helpers.cuh
---- ffmpeg-4.4.orig/libavfilter/cuda/vector_helpers.cuh	2021-06-25 01:02:34.907043342 +0200
+--- ffmpeg-4.4.orig/libavfilter/cuda/vector_helpers.cuh	2021-07-17 18:11:54.082732013 +0200
 +++ ffmpeg-4.4/libavfilter/cuda/vector_helpers.cuh	1970-01-01 01:00:00.000000000 +0100
 @@ -1,112 +0,0 @@
 -/*
@@ -255,7 +255,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/vector_helpers.cuh ffmpeg-4.4/libavf
 -#endif
 diff -rupN ffmpeg-4.4.orig/libavfilter/dither_matrix.h ffmpeg-4.4/libavfilter/dither_matrix.h
 --- ffmpeg-4.4.orig/libavfilter/dither_matrix.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/dither_matrix.h	2021-06-25 01:16:08.807098099 +0200
++++ ffmpeg-4.4/libavfilter/dither_matrix.h	2021-07-17 18:29:37.758483471 +0200
 @@ -0,0 +1,74 @@
 +/*
 + * Dither matrix data
@@ -332,8 +332,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/dither_matrix.h ffmpeg-4.4/libavfilter/di
 +	3130, 1156, 2356, 3728,  915, 3105, 2059,  170, 3753, 1080,  503, 4016,  804, 3115, 1361, 2693,   86, 1837, 3854, 2349,  769, 2846,  393, 3117, 2072, 1257, 3867, 2031,  135, 4084, 1958, 2709,  708, 3243, 1570, 3708, 1130, 3419, 1695, 3858, 1508,  658, 3786, 1707, 3472,   69, 2434, 4052,  421, 3599,  664, 2573,   53, 3382, 2642,  957, 3193, 1499, 2238, 3024, 1559,  494, 3689, 2584,
 +};
 diff -rupN ffmpeg-4.4.orig/libavfilter/Makefile ffmpeg-4.4/libavfilter/Makefile
---- ffmpeg-4.4.orig/libavfilter/Makefile	2021-06-25 01:02:34.903710010 +0200
-+++ ffmpeg-4.4/libavfilter/Makefile	2021-06-25 01:15:11.727085452 +0200
+--- ffmpeg-4.4.orig/libavfilter/Makefile	2021-07-17 18:11:54.082732013 +0200
++++ ffmpeg-4.4/libavfilter/Makefile	2021-07-17 18:28:15.678049075 +0200
 @@ -393,8 +393,7 @@ OBJS-$(CONFIG_ROBERTS_OPENCL_FILTER)
  OBJS-$(CONFIG_ROTATE_FILTER)                 += vf_rotate.o
  OBJS-$(CONFIG_SAB_FILTER)                    += vf_sab.o
@@ -345,7 +345,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/Makefile ffmpeg-4.4/libavfilter/Makefile
  OBJS-$(CONFIG_SCALE_QSV_FILTER)              += vf_scale_qsv.o
  OBJS-$(CONFIG_SCALE_VAAPI_FILTER)            += vf_scale_vaapi.o scale_eval.o vaapi_vpp.o
 diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda_bicubic.cu ffmpeg-4.4/libavfilter/vf_scale_cuda_bicubic.cu
---- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda_bicubic.cu	2021-06-25 01:02:34.913710005 +0200
+--- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda_bicubic.cu	2021-07-17 18:11:54.089398716 +0200
 +++ ffmpeg-4.4/libavfilter/vf_scale_cuda_bicubic.cu	1970-01-01 01:00:00.000000000 +0100
 @@ -1,224 +0,0 @@
 -/*
@@ -573,8 +573,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda_bicubic.cu ffmpeg-4.4/libav
 -
 -}
 diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c ffmpeg-4.4/libavfilter/vf_scale_cuda.c
---- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c	2021-06-25 01:02:34.913710005 +0200
-+++ ffmpeg-4.4/libavfilter/vf_scale_cuda.c	2021-06-25 01:28:55.573595229 +0200
+--- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c	2021-07-17 18:11:54.092732068 +0200
++++ ffmpeg-4.4/libavfilter/vf_scale_cuda.c	2021-07-17 18:41:42.125600927 +0200
 @@ -1,5 +1,8 @@
  /*
  * Copyright (c) 2017, NVIDIA CORPORATION. All rights reserved.
@@ -638,15 +638,14 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c ffmpeg-4.4/libavfilter/vf
  typedef struct CUDAScaleContext {
      const AVClass *class;
  
-@@ -87,6 +76,7 @@ typedef struct CUDAScaleContext {
-      * Output sw format. AV_PIX_FMT_NONE for no conversion.
-      */
-     enum AVPixelFormat format;
-+    char *format_str;
+@@ -90,36 +79,63 @@ typedef struct CUDAScaleContext {
  
      char *w_expr;               ///< width  expression string
      char *h_expr;               ///< height expression string
-@@ -96,30 +86,56 @@ typedef struct CUDAScaleContext {
++    char *format_str;
+ 
+     int force_original_aspect_ratio;
+     int force_divisible_by;
  
      CUcontext   cu_ctx;
      CUmodule    cu_module;
@@ -656,7 +655,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c ffmpeg-4.4/libavfilter/vf
 -    CUfunction  cu_func_ushort;
 -    CUfunction  cu_func_ushort2;
 -    CUfunction  cu_func_ushort4;
-+
+++
 +#define VARIANT(NAME) \
 +    CUfunction  cu_func_ ## NAME;
 +#define VARIANTSET(NAME) \
@@ -688,11 +687,10 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c ffmpeg-4.4/libavfilter/vf
 -    int interp_algo;
 -    int interp_use_linear;
 -    int interp_as_integer;
--
--    float param;
 +    const AVPixFmtDescriptor *in_desc, *out_desc;
 +    int         in_planes, out_planes;
-+ 
+ 
+-    float param;
 +    CUdeviceptr ditherBuffer;
 +    CUtexObject ditherTex;
  } CUDAScaleContext;
@@ -1159,9 +1157,9 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.c ffmpeg-4.4/libavfilter/vf
  };
  
 diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu ffmpeg-4.4/libavfilter/vf_scale_cuda.cu
---- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu	2021-06-25 01:02:34.913710005 +0200
-+++ ffmpeg-4.4/libavfilter/vf_scale_cuda.cu	2021-06-25 01:34:16.179854108 +0200
-@@ -20,35 +20,115 @@
+--- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu	2021-07-17 18:11:54.082732013 +0200
++++ ffmpeg-4.4/libavfilter/vf_scale_cuda.cu	2021-07-17 18:47:42.510822424 +0200
+@@ -20,35 +20,117 @@
   * DEALINGS IN THE SOFTWARE.
   */
  
@@ -1180,8 +1178,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu ffmpeg-4.4/libavfilter/v
 +
 +template<class SRC, class DST, int shift, int dither> struct add_conv_shift1_d
  {
--    int xo = blockIdx.x * blockDim.x + threadIdx.x;
--    int yo = blockIdx.y * blockDim.y + threadIdx.y;
+     int xo = blockIdx.x * blockDim.x + threadIdx.x;
+     int yo = blockIdx.y * blockDim.y + threadIdx.y;
 +    typedef DST dstbase;
  
 -    if (yo < dst_height && xo < dst_width)
@@ -1205,13 +1203,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu ffmpeg-4.4/libavfilter/v
 +template<class SRC, class DST, int shift, int dither> struct add_conv_shift1
 +{
 +    typedef DST dstbase;
- 
--template<typename T>
--__device__ inline void Subsample_Bilinear(cudaTextureObject_t tex,
--                                          T *dst,
--                                          int dst_width, int dst_height, int dst_pitch,
--                                          int src_width, int src_height,
--                                          int bit_depth)
++
 +    __inline__ __device__ DST operator()(SRC i1, SRC i2, SRC i3, SRC i4, ushort d)
 +    {
 +        unsigned ret = (unsigned)i1 + (unsigned)i2 + (unsigned)i3 + (unsigned)i4 + 2;
@@ -1289,7 +1281,13 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu ffmpeg-4.4/libavfilter/v
 +            return { SHIFTUP(retx),   SHIFTUP(rety),   SHIFTUP(retz),   SHIFTUP(retw)   };
 +    }
 +};
-+
+ 
+-template<typename T>
+-__device__ inline void Subsample_Bilinear(cudaTextureObject_t tex,
+-                                          T *dst,
+-                                          int dst_width, int dst_height, int dst_pitch,
+-                                          int src_width, int src_height,
+-                                          int bit_depth)
 +template<class SRC, class DST, template<class, class, int, int> class conv, int pitch, int shift, int dither>
 +__inline__ __device__ void Subsample_Bilinear(cudaTextureObject_t tex,
 +                                   DST *dst,
@@ -1299,7 +1297,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu ffmpeg-4.4/libavfilter/v
  {
      int xo = blockIdx.x * blockDim.x + threadIdx.x;
      int yo = blockIdx.y * blockDim.y + threadIdx.y;
-@@ -66,58 +146,48 @@ __device__ inline void Subsample_Bilinea
+@@ -66,58 +147,48 @@ __device__ inline void Subsample_Bilinea
          float dx = wh / (0.5f + wh);
          float dy = wv / (0.5f + wv);
  
@@ -1397,7 +1395,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.cu ffmpeg-4.4/libavfilter/v
  
  }
 diff -rupN ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.h ffmpeg-4.4/libavfilter/vf_scale_cuda.h
---- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.h	2021-06-25 01:02:34.913710005 +0200
+--- ffmpeg-4.4.orig/libavfilter/vf_scale_cuda.h	2021-07-17 18:11:54.089398716 +0200
 +++ ffmpeg-4.4/libavfilter/vf_scale_cuda.h	1970-01-01 01:00:00.000000000 +0100
 @@ -1,28 +0,0 @@
 -/*

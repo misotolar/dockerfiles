@@ -1,0 +1,173 @@
+diff -rupN ffmpeg-4.4.orig/libavfilter/opencl/colorspace_common.cl ffmpeg-4.4/libavfilter/opencl/colorspace_common.cl
+--- ffmpeg-4.4.orig/libavfilter/opencl/colorspace_common.cl	2021-07-17 19:09:42.177794318 +0200
++++ ffmpeg-4.4/libavfilter/opencl/colorspace_common.cl	2021-07-17 19:10:32.258059791 +0200
+@@ -59,6 +59,14 @@ float eotf_st2084(float x) {
+     return x > 0.0f ? c * ST2084_MAX_LUMINANCE / REFERENCE_WHITE : 0.0f;
+ }
+ 
++float inverse_eotf_st2084(float x) {
++    float a = x;
++    x *= REFERENCE_WHITE / ST2084_MAX_LUMINANCE;
++    x = powr(x, ST2084_M1);
++    x = (ST2084_C1 + ST2084_C2 * x) / (1.0f + ST2084_C3 * x);
++    return a > 0.0f ? powr(x, ST2084_M2) : 0.0f;
++}
++
+ __constant const float HLG_A = 0.17883277f;
+ __constant const float HLG_B = 0.28466892f;
+ __constant const float HLG_C = 0.55991073f;
+diff -rupN ffmpeg-4.4.orig/libavfilter/opencl/tonemap.cl ffmpeg-4.4/libavfilter/opencl/tonemap.cl
+--- ffmpeg-4.4.orig/libavfilter/opencl/tonemap.cl	2021-07-17 19:09:42.177794318 +0200
++++ ffmpeg-4.4/libavfilter/opencl/tonemap.cl	2021-07-17 19:14:47.106077287 +0200
+@@ -23,6 +23,8 @@ extern float3 yuv2lrgb(float3);
+ extern float3 lrgb2lrgb(float3);
+ extern float  get_luma_src(float3);
+ extern float  get_luma_dst(float3);
++extern float  eotf_st2084(float);
++extern float  inverse_eotf_st2084(float);
+ extern float3 ootf(float3 c, float peak);
+ extern float3 inverse_ootf(float3 c, float peak);
+ extern float3 get_chroma_sample(float3, float3, float3, float3);
+@@ -37,33 +39,33 @@ float hable_f(float in) {
+     return (in * (in * a + b * c) + d * e) / (in * (in * a + b) + d * f) - e / f;
+ }
+ 
+-float direct(float s, float peak) {
++float direct(float s, float peak, float target_peak) {
+     return s;
+ }
+ 
+-float linear(float s, float peak) {
++float linear(float s, float peak, float target_peak) {
+     return s * tone_param / peak;
+ }
+ 
+-float gamma(float s, float peak) {
++float gamma(float s, float peak, float target_peak) {
+     float p = s > 0.05f ? s /peak : 0.05f / peak;
+     float v = powr(p, 1.0f / tone_param);
+     return s > 0.05f ? v : (s * v /0.05f);
+ }
+ 
+-float clip(float s, float peak) {
++float clip(float s, float peak, float target_peak) {
+     return clamp(s * tone_param, 0.0f, 1.0f);
+ }
+ 
+-float reinhard(float s, float peak) {
++float reinhard(float s, float peak, float target_peak) {
+     return s / (s + tone_param) * (peak + tone_param) / peak;
+ }
+ 
+-float hable(float s, float peak) {
++float hable(float s, float peak, float target_peak) {
+     return hable_f(s)/hable_f(peak);
+ }
+ 
+-float mobius(float s, float peak) {
++float mobius(float s, float peak, float target_peak) {
+     float j = tone_param;
+     float a, b;
+ 
+@@ -76,6 +78,25 @@ float mobius(float s, float peak) {
+     return (b * b + 2.0f * b * j + j * j) / (b - a) * (s + a) / (s + b);
+ }
+ 
++float bt2390(float s, float peak, float target_peak) {
++    float peak_pq = inverse_eotf_st2084(peak);
++    float scale = 1.0f / peak_pq;
++
++    float s_pq = inverse_eotf_st2084(s) * scale;
++    float maxLum = inverse_eotf_st2084(target_peak) * scale;
++
++    float ks = 1.5f * maxLum - 0.5f;
++    float tb = (s_pq - ks) / (1.0f - ks);
++    float tb2 = tb * tb;
++    float tb3 = tb2 * tb;
++    float pb = (2.0f * tb3 - 3.0f * tb2 + 1.0f) * ks +
++               (tb3 - 2.0f * tb2 + tb) * (1.0f - ks) +
++               (-2.0f * tb3 + 3.0f * tb2) * maxLum;
++    float sig = (s_pq < ks) ? s_pq : pb;
++
++    return eotf_st2084(sig * peak_pq);
++}
++
+ // detect peak/average signal of a frame, the algorithm was ported from:
+ // libplacebo (https://github.com/haasn/libplacebo)
+ struct detection_result
+@@ -179,9 +200,11 @@ float3 map_one_pixel_rgb(float3 rgb, flo
+     float sig_old = sig;
+ 
+     // Scale the signal to compensate for differences in the average brightness
++    /*
+     float slope = min(1.0f, sdr_avg / average);
+     sig *= slope;
+     peak *= slope;
++    */
+ 
+     // Desaturate the color using a coefficient dependent on the signal level
+     if (desat_param > 0.0f) {
+@@ -189,10 +212,12 @@ float3 map_one_pixel_rgb(float3 rgb, flo
+         float coeff = max(sig - 0.18f, 1e-6f) / max(sig, 1e-6f);
+         coeff = native_powr(coeff, 10.0f / desat_param);
+         rgb = mix(rgb, (float3)luma, (float3)coeff);
++        /*
+         sig = mix(sig, luma * slope, coeff);
++        */
+     }
+ 
+-    sig = TONE_FUNC(sig, peak);
++    sig = TONE_FUNC(sig, peak, target_peak);
+ 
+     sig = min(sig, 1.0f);
+     rgb *= (sig/sig_old);
+@@ -241,7 +266,13 @@ __kernel void tonemap(__write_only image
+     float sig3 = max(c3.x, max(c3.y, c3.z));
+     float sig = max(sig0, max(sig1, max(sig2, sig3)));
+ 
++    /*
+     struct detection_result r = detect_peak_avg(util_buf, &sum_wg, sig, peak);
++    */
++
++    struct detection_result r;
++    r.peak = peak;
++    r.average = 1.0;
+ 
+     float3 c0_old = c0, c1_old = c1, c2_old = c2;
+     c0 = map_one_pixel_rgb(c0, r.peak, r.average);
+diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_opencl.c ffmpeg-4.4/libavfilter/vf_tonemap_opencl.c
+--- ffmpeg-4.4.orig/libavfilter/vf_tonemap_opencl.c	2021-07-17 19:09:42.181127669 +0200
++++ ffmpeg-4.4/libavfilter/vf_tonemap_opencl.c	2021-07-17 19:16:24.243258832 +0200
+@@ -46,6 +46,7 @@ enum TonemapAlgorithm {
+     TONEMAP_REINHARD,
+     TONEMAP_HABLE,
+     TONEMAP_MOBIUS,
++    TONEMAP_BT2390,
+     TONEMAP_MAX,
+ };
+ 
+@@ -99,6 +100,7 @@ static const char *const tonemap_func[TO
+     [TONEMAP_REINHARD] = "reinhard",
+     [TONEMAP_HABLE]    = "hable",
+     [TONEMAP_MOBIUS]   = "mobius",
++    [TONEMAP_BT2390]   = "bt2390",
+ };
+ 
+ static void get_rgb2rgb_matrix(enum AVColorPrimaries in, enum AVColorPrimaries out,
+@@ -196,6 +198,8 @@ static int tonemap_opencl_init(AVFilterC
+ 
+     av_bprintf(&header, "#define chroma_loc %d\n", (int)ctx->chroma_loc);
+ 
++    av_bprintf(&header, "#define powr native_powr\n");
++
+     if (rgb2rgb_passthrough)
+         av_bprintf(&header, "#define RGB2RGB_PASSTHROUGH\n");
+     else
+@@ -493,6 +497,7 @@ static const AVOption tonemap_opencl_opt
+     {     "reinhard", 0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_REINHARD},          0, 0, FLAGS, "tonemap" },
+     {     "hable",    0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_HABLE},             0, 0, FLAGS, "tonemap" },
+     {     "mobius",   0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_MOBIUS},            0, 0, FLAGS, "tonemap" },
++    {     "bt2390",   0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_BT2390},            0, 0, FLAGS, "tonemap" },
+     { "transfer", "set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, {.i64 = AVCOL_TRC_BT709}, -1, INT_MAX, FLAGS, "transfer" },
+     { "t",        "set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, {.i64 = AVCOL_TRC_BT709}, -1, INT_MAX, FLAGS, "transfer" },
+     {     "bt709",            0,       0,                 AV_OPT_TYPE_CONST, {.i64 = AVCOL_TRC_BT709},         0, 0, FLAGS, "transfer" },
