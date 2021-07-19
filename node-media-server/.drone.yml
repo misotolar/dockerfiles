@@ -2,7 +2,18 @@ kind: pipeline
 type: docker
 name: default
 
+clone:
+  disable: true
+
 steps:
+
+- name: clone
+  image: alpine/git
+  commands:
+  - git init --quiet
+  - git remote add origin $DRONE_REMOTE_URL
+  - git fetch --quiet --depth=1 origin "+refs/heads/$DRONE_BRANCH:"
+  - git checkout $DRONE_COMMIT -b $DRONE_BRANCH
 
 - name: publish
   image: plugins/docker
@@ -15,8 +26,8 @@ steps:
     dockerfile: node-media-server/Dockerfile
     context: ./node-media-server
     tags:
-      - ${DRONE_COMMIT_SHA:0:8}
-      - latest
+    - ${DRONE_COMMIT_SHA:0:8}
+    - latest
 
 - name: update
   image: misotolar/dockerhub-update
