@@ -1,0 +1,12 @@
+*.json
+*.lock
+examples
+js/src
+setup
+test
+ChangeLog
+config.sample.inc.php
+CONTRIBUTING.md
+README
+RELEASE-DATE-*
+show_config_errors.php

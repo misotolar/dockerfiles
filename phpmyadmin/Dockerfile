@@ -1,4 +1,6 @@
-FROM php:8.0-fpm-alpine
+ARG ALPINE_VERSION=3.13
+
+FROM php:8.0-fpm-alpine$ALPINE_VERSION
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -13,9 +15,9 @@ ENV UPLOAD_LIMIT 2048K
 RUN set -ex; \
     apk add --no-cache \
         bash \
-        rsync \
         tzdata; \
     apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
         bzip2-dev \
         freetype-dev \
         libjpeg-turbo-dev \
@@ -61,42 +63,18 @@ RUN set -ex; \
         echo 'post_max_size=${UPLOAD_LIMIT}'; \
         echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/phpmyadmin-misc.ini; \
-    apk add --no-cache --virtual .fetch-deps \
-        gnupg \
-    ; \
-    export GNUPGHOME="$(mktemp -d)"; \
-    export GPGKEY="3D06A59ECE730EB71B511C17CE752F178259BD92"; \
-    echo "disable-ipv6" > "$GNUPGHOME/dirmngr.conf"; \
-    curl -fsSL -o phpMyAdmin.tar.xz $URL; \
-    curl -fsSL -o phpMyAdmin.tar.xz.asc $URL.asc; \
-    echo "$SHA256 *phpMyAdmin.tar.xz" | sha256sum -c -; \
-    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver ipv4.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver keys.gnupg.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver pgp.mit.edu --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver keyserver.pgp.com --recv-keys "$GPGKEY"; \
-    gpg --batch --verify phpMyAdmin.tar.xz.asc phpMyAdmin.tar.xz; \
-    gpgconf --kill all; \
-    mkdir -p /usr/src/phpmyadmin/tmp; \
-    chown www-data:www-data /usr/src/phpmyadmin/tmp; \
-    tar -xf phpMyAdmin.tar.xz -C /usr/src/phpmyadmin --strip-components=1; \
-    sed -i "s@define('CONFIG_DIR'.*@define('CONFIG_DIR', '/etc/phpmyadmin/');@" /usr/src/phpmyadmin/libraries/vendor_config.php; \
-    apk del --no-network .fetch-deps; \
+    curl -fsSL -o /usr/src/phpMyAdmin.tar.xz $URL; \
+    echo "$SHA256 */usr/src/phpMyAdmin.tar.xz" | sha256sum -c -; \
     rm -rf \
-        phpMyAdmin.tar.xz \
-        phpMyAdmin.tar.xz.asc \
-        /usr/src/phpmyadmin/examples \
-        /usr/src/phpmyadmin/po \
-        /usr/src/phpmyadmin/setup \
-        /usr/src/phpmyadmin/test \
-        /usr/src/phpmyadmin/composer.json \
-        /usr/src/phpmyadmin/RELEASE-DATE-$VERSION \
+        /usr/src/php.tar.xz \
+        /usr/src/php.tar.xz.asc \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*
 
 COPY config.inc.php /etc/phpmyadmin/config.inc.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY exclude.txt /usr/src/phpMyAdmin.exclude
 
 VOLUME /var/www/html
 
