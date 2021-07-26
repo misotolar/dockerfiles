@@ -1,4 +1,6 @@
-FROM php:7.4-fpm-alpine
+ARG ALPINE_VERSION=3.13
+
+FROM php:7.4-fpm-alpine$ALPINE_VERSION
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -14,12 +16,13 @@ RUN set -ex; \
     apk add --no-cache \
         bash \
         postgresql-client \
-        rsync \
         tzdata; \
     apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
         postgresql-dev \
     ; \
     docker-php-ext-install \
+        opcache \
         pgsql \
     ; \
     runDeps="$( \
@@ -51,26 +54,18 @@ RUN set -ex; \
         echo 'post_max_size=${UPLOAD_LIMIT}'; \
         echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/phpmyadmin-misc.ini; \
-    curl -fsSL -o phpPgAdmin.tar.gz $URL; \
-    echo "$SHA256  phpPgAdmin.tar.gz" | sha256sum -c -; \
-    mkdir -p /usr/src/phppgadmin; \
-    tar -xf phpPgAdmin.tar.gz -C /usr/src/phppgadmin --strip-components=1; \
+    curl -fsSL -o /usr/src/phpPgAdmin.tar.gz $URL; \
+    echo "$SHA256 */usr/src/phpPgAdmin.tar.gz" | sha256sum -c -; \
     rm -rf \
-        phpPgAdmin.tar.gz \
-        /usr/src/phppgadmin/BUGS \
-        /usr/src/phppgadmin/DEVELOPERS \
-        /usr/src/phppgadmin/FAQ \
-        /usr/src/phppgadmin/HISTORY \
-        /usr/src/phppgadmin/INSTALL \
-        /usr/src/phppgadmin/TODO \
-        /usr/src/phppgadmin/TRANSLATORS \
-        /usr/src/phppgadmin/composer.json \
+        /usr/src/php.tar.xz \
+        /usr/src/php.tar.xz.asc \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*
 
 COPY config.inc.php /etc/phppgadmin/config.inc.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY exclude.txt /usr/src/phpPgAdmin.exclude
 
 VOLUME /var/www/html
 

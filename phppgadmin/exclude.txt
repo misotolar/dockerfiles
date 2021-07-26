@@ -1,0 +1,12 @@
+*.json
+BUGS
+config/config.*
+DEVELOPERS
+FAQ
+HISTORY
+INSTALL
+lang/langcheck
+lang/README
+lang/synch
+TODO
+TRANSLATORS
