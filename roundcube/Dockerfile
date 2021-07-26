@@ -1,4 +1,6 @@
-FROM php:7.4-fpm-alpine
+ARG ALPINE_VERSION=3.13
+
+FROM php:7.4-fpm-alpine$ALPINE_VERSION
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -79,31 +81,18 @@ RUN set -ex; \
         echo 'post_max_size=${UPLOAD_LIMIT}'; \
         echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/roundcube-misc.ini; \
-    apk add --no-cache --virtual .fetch-deps \
-        gnupg \
-    ; \
-    export GNUPGHOME="$(mktemp -d)"; \
-    export GPGKEY="F3E4C04BB3DB5D4215C45F7F5AB2BAA141C4F7D5"; \
-    echo "disable-ipv6" > "$GNUPGHOME/dirmngr.conf"; \
     curl -fsSL -o roundcubemail.tar.gz $URL; \
-    curl -fsSL -o roundcubemail.tar.gz.asc $URL.asc; \
     echo "$SHA256 *roundcubemail.tar.gz" | sha256sum -c -; \
-    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver ipv4.pool.sks-keyservers.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver keys.gnupg.net --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver pgp.mit.edu --recv-keys "$GPGKEY" \
-        || gpg --batch --keyserver keyserver.pgp.com --recv-keys "$GPGKEY"; \
-    gpg --batch --verify roundcubemail.tar.gz.asc roundcubemail.tar.gz; \
-    gpgconf --kill all; \
     mkdir -p /usr/src/roundcubemail; \
     tar -xf roundcubemail.tar.gz -C /usr/src/roundcubemail --strip-components=1 --no-same-owner; \
     chown -R www-data:www-data /usr/src/roundcubemail/logs; \
     curl -fsSL -o /tmp/composer-installer.php https://getcomposer.org/installer; \
     php /tmp/composer-installer.php --install-dir=/usr/local/bin; \
-    apk del --no-network .fetch-deps; \
     rm -rf \
         roundcube.tar.gz \
         roundcube.tar.gz.asc \
+        /usr/src/php.tar.xz \
+        /usr/src/php.tar.xz.asc \
         /usr/src/roundcubemail/installer \
         /var/cache/apk/* \
         /var/tmp/* \
