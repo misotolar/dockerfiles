@@ -45,7 +45,8 @@ RUN set -ex; \
         zip \
     ; \
     pecl install imagick; \
-    docker-php-ext-enable imagick; \
+    pecl install redis; \
+    docker-php-ext-enable imagick redis; \
     runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
             | tr ',' '\n' \
