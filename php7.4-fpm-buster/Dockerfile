@@ -8,8 +8,7 @@ ENV PHP_USER_GECOS Debian Buster
 ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 7.4
-ENV PHP_VERSION_DATE 20190902
-ENV PHP_PACKAGE_VERSION 7.4.21-1
+ENV PHP_PACKAGE_VERSION 7.4.22-1
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
@@ -54,7 +53,7 @@ RUN set -ex; \
         tzdata; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
     curl -fsSL -o /tmp/sourceguardian.tar.gz http://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz; \
-    tar --extract --file=/tmp/sourceguardian.tar.gz --directory=/usr/lib/php/${PHP_VERSION_DATE} ixed.${PHP_VERSION}.lin; \
+    tar xf /tmp/sourceguardian.tar.gz -C $(php-config --extension-dir) ixed.${PHP_VERSION}.lin; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
