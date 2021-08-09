@@ -1,5 +1,3 @@
-*.json
-*.lock
 examples
 js/src
 setup
