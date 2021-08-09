@@ -28,7 +28,7 @@ fi
 
 tar -xf /usr/src/phpMyAdmin.tar.xz -C /var/www/html --exclude-from=/usr/src/phpMyAdmin.exclude --strip-components=1
 sed -i "s@define('CONFIG_DIR'.*@define('CONFIG_DIR', '/etc/phpmyadmin/');@" /var/www/html/libraries/vendor_config.php
-mkdir /var/www/html/tmp; chown www-data:www-data /var/www/html/tmp
+mkdir -p /var/www/html/tmp; chown www-data:www-data /var/www/html/tmp
 
 get_docker_secret() {
     local env_var="${1}"
