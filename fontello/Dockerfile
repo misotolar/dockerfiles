@@ -29,7 +29,7 @@ RUN set -ex; \
 
 FROM node:14-buster-slim AS build
 
-ARG VERSION=e2689251690c53774cde12a843f7d1c6c028ad12
+ARG VERSION=e3ded4b572ef28d82f5d41bfe60704a4b57cc760
 ARG URL=https://github.com/fontello/fontello.git
 
 ARG DEBIAN_FRONTEND=noninteractive
