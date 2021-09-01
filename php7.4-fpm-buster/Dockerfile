@@ -8,7 +8,7 @@ ENV PHP_USER_GECOS Debian Buster
 ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 7.4
-ENV PHP_PACKAGE_VERSION 7.4.22-1
+ENV PHP_PACKAGE_VERSION 7.4.23-1
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
@@ -37,6 +37,7 @@ RUN set -ex; \
         php${PHP_VERSION}-bz2 \
         php${PHP_VERSION}-cli \
         php${PHP_VERSION}-curl \
+        php${PHP_VERSION}-dev \
         php${PHP_VERSION}-fpm \
         php${PHP_VERSION}-gd \
         php${PHP_VERSION}-imagick \
@@ -59,7 +60,8 @@ RUN set -ex; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
     apt-get remove --purge -y \
         curl \
-        gnupg; \
+        gnupg \
+        php${PHP_VERSION}-dev; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
