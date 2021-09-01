@@ -8,8 +8,7 @@ ENV PHP_USER_GECOS Ubuntu Bionic
 ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 5.6
-ENV PHP_VERSION_DATE 20131226
-ENV PHP_PACKAGE_VERSION 5.6.40-52
+ENV PHP_PACKAGE_VERSION 5.6.40-53
 
 ENV PHP_DIO_VERSION 0.2.0
 ENV PHP_EVENT_VERSION 3.0.4
@@ -33,7 +32,6 @@ RUN set -ex; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
-        build-essential \
         curl \
         gettext-base \
         joe \
@@ -77,14 +75,12 @@ RUN set -ex; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-event.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/event.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-event.ini; \
     curl -fsSL -o /tmp/sourceguardian.tar.gz http://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz; \
-    tar --extract --file=/tmp/sourceguardian.tar.gz --directory=/usr/lib/php/${PHP_VERSION_DATE} ixed.${PHP_VERSION}.lin; \
+    tar xf /tmp/sourceguardian.tar.gz -C $(php-config --extension-dir) ixed.${PHP_VERSION}.lin; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
     apt-get remove --purge -y \
-        build-essential \
         curl \
-        dpkg-dev \
         gnupg \
         libevent-dev \
         php-pear \
