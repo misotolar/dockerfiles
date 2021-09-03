@@ -49,14 +49,9 @@ RUN set -ex; \
         libevent-pthreads-2.1-6 \
         libevent-dev \
         libimage-exiftool-perl \
-        libjpeg8-dev \
-        libjpeg-turbo8-dev \
         libhidapi-dev \
         libhidapi-hidraw0 \
         libhidapi-libusb0 \
-        libv4l-0 \
-        libv4l-dev \
-        libv4lconvert0 \
         locales \
         minicom \
         msodbcsql17 \
@@ -109,19 +104,15 @@ RUN set -ex; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
-    git clone https://github.com/jacksonliam/mjpg-streamer.git /tmp/mjpg-streamer; \
-    cd /tmp/mjpg-streamer/mjpg-streamer-experimental; make USE_LIBV4L2=true all; make install; \
     git clone https://github.com/darrylb123/usbrelay /tmp/usbrelay; \
     cd /tmp/usbrelay; make; make install; \
     apt-get remove --purge -y \
         build-essential \
-        cmake \
         curl \
         dpkg-dev \
         git \
         gnupg \
         libevent-dev \
-        libv4l-dev \
         linux-libc-dev \
         php-pear \
         php${PHP_VERSION}-dev; \
