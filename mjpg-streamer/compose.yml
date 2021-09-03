@@ -1,0 +1,4 @@
+services:
+    mjpg-streamer:
+        build: .
+        container_name: mjpg-streamer
