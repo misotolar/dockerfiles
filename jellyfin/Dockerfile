@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.13
+ARG ALPINE_VERSION=3.14
 
 FROM alpine:$ALPINE_VERSION as build
 
@@ -10,8 +10,8 @@ ARG MEDIASDK_VERSION=21.2.3
 ARG MEDIASDK_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz"
 ARG MEDIASDK_SHA256=7791be83e5e9f6d55f31d6ad9037012fc78b846724644b9db2087d1b7dfec078
 
-ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib64:/usr/local/lib64:/usr/local/lib:/usr/lib:/lib
-ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib64/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
+ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
+ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
 ARG SRC=/usr/local
 ARG PREFIX=/usr/local
 
@@ -62,6 +62,7 @@ RUN set -ex; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     apk add --no-cache --upgrade \
         gcc \
+        g++ \
         ffmpeg-libs \
         ffmpeg-dev \
         libva-dev \
@@ -148,7 +149,7 @@ RUN set -ex; \
     ./extractlibrary cplist /build; \
     cp --archive --parents --no-dereference /opt/intel /build
 
-FROM misotolar/jellyfin-server:e6af087b
+FROM misotolar/jellyfin-server:d330ba81
 
 LABEL mantainer="michal@sotolar.com"
 
