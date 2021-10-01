@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.14
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -35,8 +35,6 @@ ADD patches/sofia-sip/*.patch /patches/sofia-sip/
 WORKDIR /build
 
 RUN set -ex; \
-    apk add --no-cache \
-        tzdata; \
     apk add --no-cache --virtual .build-deps \
         autoconf \
         automake \
