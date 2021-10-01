@@ -1,0 +1,6 @@
+services:
+    drone-docker-update:
+        build: .
+        container_name: drone-docker-update
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
