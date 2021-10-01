@@ -1,5 +1,5 @@
 ARG DOTNET_VERSION=5.0
-ARG ALPINE_VERSION=3.13
+ARG ALPINE_VERSION=3.14
 
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}-alpine AS build
 
@@ -86,8 +86,7 @@ RUN set -ex; \
         icu-libs \
         libssl1.1 \
         libstdc++ \
-        libintl \
-        tzdata; \
+        libintl; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \

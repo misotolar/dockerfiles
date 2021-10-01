@@ -2,5 +2,3 @@ services:
     jellyfin-server:
         build: .
         container_name: jellyfin-server
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
