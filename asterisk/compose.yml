@@ -2,5 +2,7 @@ services:
     asterisk:
         build: .
         container_name: asterisk
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
         cap_add:
             - NET_ADMIN

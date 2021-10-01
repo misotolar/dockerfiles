@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.14
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -11,8 +11,7 @@ RUN set -ex; \
     apk add --update \
         asterisk \
         asterisk-odbc \
-        asterisk-sample-config \
-        tzdata; \
+        asterisk-sample-config; \
     echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
     apk add --update \
         mariadb-connector-odbc; \
