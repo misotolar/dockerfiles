@@ -153,7 +153,7 @@ FROM misotolar/jellyfin-server:d330ba81
 
 LABEL mantainer="michal@sotolar.com"
 
-ENV LD_LIBRARY_PATH=/opt/intel/mediasdk/lib64:/usr/local/lib64:/usr/local/lib:/usr/lib:/lib
+ENV LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
 
 RUN set -ex; \
     apk add --no-cache --upgrade \
