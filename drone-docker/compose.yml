@@ -1,0 +1,4 @@
+services:
+    drone-docker:
+        build: .
+        container_name: drone-docker

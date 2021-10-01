@@ -1,5 +1,6 @@
 asterisk/.drone.yml
 dockerhub-update/.drone.yml
+drone-docker/.drone.yml
 fontello/.drone.yml
 geoipupdate/.drone.yml
 janus-sip-gateway/.drone.yml
