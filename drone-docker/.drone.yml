@@ -30,7 +30,7 @@ steps:
     - latest
 
 - name: update
-  image: misotolar/dockerhub-update
+  image: misotolar/drone-docker-update
   settings: 
     username: 
       from_secret: DOCKER_USERNAME
