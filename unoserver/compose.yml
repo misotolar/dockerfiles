@@ -1,0 +1,7 @@
+services:
+    unoserver:
+        build: .
+        container_name: unoserver
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /usr/share/fonts:/root/.fonts:ro

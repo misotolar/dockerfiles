@@ -18,3 +18,4 @@ phpmyadmin/.drone.yml
 phppgadmin/.drone.yml
 roundcube/.drone.yml
 unoconv/.drone.yml
+unoserver/.drone.yml
