@@ -25,6 +25,7 @@ if ! id -u "$PHP_USER" > /dev/null 2>&1; then
     echo "$PHP_USER ALL=(ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/"$PHP_USER"
     touch /home/"$PHP_USER"/.sudo_as_admin_successful
     usermod -aG dialout,disk,video,sudo "$PHP_USER"
+    chown $PHP_USER:$PHP_USER /home/$PHP_USER
 fi
 
 envsubst < "/etc/php/php-fpm.conf" > "/etc/php/$PHP_VERSION/fpm/php-fpm.conf"
