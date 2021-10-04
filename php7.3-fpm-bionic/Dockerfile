@@ -8,10 +8,10 @@ ENV PHP_USER_GECOS Ubuntu Bionic
 ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 7.3
-ENV PHP_PACKAGE_VERSION 7.3.30-1
+ENV PHP_PACKAGE_VERSION 7.3.31-1
 
 ENV PHP_DIO_VERSION 0.2.0
-ENV PHP_EVENT_VERSION 3.0.5
+ENV PHP_EVENT_VERSION 3.0.6
 ENV PHP_SQLSRV_VERSION 5.9.0
 
 ARG ACCEPT_EULA=Y
@@ -35,25 +35,33 @@ RUN set -ex; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
+        bash-completion \
         build-essential \
         cmake \
         curl \
         cups-client \
+        direnv \
         docker-ce-cli \
         git \
         gettext-base \
         iproute2 \
         joe \
         libevent-2.1-6 \
+        libevent-dev \
         libevent-extra-2.1-6 \
         libevent-openssl-2.1-6 \
         libevent-pthreads-2.1-6 \
-        libevent-dev \
         libimage-exiftool-perl \
+        libjpeg8 \
+        libjpeg8-dev \
+        libjpeg-turbo8 \
+        libjpeg-turbo8-dev \
         libhidapi-dev \
         libhidapi-hidraw0 \
         libhidapi-libusb0 \
-        locales \
+        libv4l-0 \
+        libv4l-dev \
+        libv4lconvert0 \
         minicom \
         msodbcsql17 \
         php-pear \
@@ -81,7 +89,9 @@ RUN set -ex; \
         php${PHP_VERSION}-xml \
         tzdata \
         sassc \
-        sudo; \
+        sudo \
+        xfce4-terminal \
+        xprintidle; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
     pecl channel-update pecl.php.net; \
     echo "\n\n\n\n\n\n\n\n" | pecl install \
@@ -107,15 +117,21 @@ RUN set -ex; \
     echo "zend_extension = ixed.${PHP_VERSION}.lin" | tee /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/cli/conf.d/50-sourceguardian.ini; \
     ln -fs /etc/php/${PHP_VERSION}/mods-available/sourceguardian.ini /etc/php/${PHP_VERSION}/fpm/conf.d/50-sourceguardian.ini; \
+    git clone https://github.com/jacksonliam/mjpg-streamer.git /tmp/mjpg-streamer; \
+    cd /tmp/mjpg-streamer/mjpg-streamer-experimental; make USE_LIBV4L2=true all; make install; \
     git clone https://github.com/darrylb123/usbrelay /tmp/usbrelay; \
     cd /tmp/usbrelay; make; make install; \
     apt-get remove --purge -y \
         build-essential \
+        cmake \
         curl \
         dpkg-dev \
         git \
         gnupg \
         libevent-dev \
+        libjpeg8-dev \
+        libjpeg-turbo8-dev \
+        libv4l-dev \
         linux-libc-dev \
         php-pear \
         php${PHP_VERSION}-dev; \
