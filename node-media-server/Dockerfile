@@ -1,8 +1,8 @@
 ARG NODE_VERSION=lts
 
-FROM node:${NODE_VERSION}-alpine
+FROM node:$NODE_VERSION-alpine
 
-ARG VERSION=74cad007f7d8bda77e89908035bbef8ab86da689
+ARG VERSION=95bfc0659448d8e8e57d9014cf14039475af1496
 ARG URL=https://github.com/misotolar/Node-Media-Server
 
 ENV APP_RTMP_PORT 1935
@@ -28,14 +28,12 @@ WORKDIR /usr/local/node-media-server
 
 RUN set -ex; \
     apk add --no-cache \
-        bash \
-        gettext \
         ffmpeg \
-        tzdata; \
+        gettext; \
     apk add --no-cache --virtual .fetch-deps \
         git; \
-    git clone ${URL} --depth=1 .; \
-    git reset --hard ${VERSION}; \
+    git clone $URL --depth=1 .; \
+    git reset --hard $VERSION; \
     npm i; \
     apk del --no-network .fetch-deps; \
     rm -rf \
