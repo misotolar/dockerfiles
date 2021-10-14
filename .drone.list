@@ -17,5 +17,6 @@ php7.4-fpm-buster/.drone.yml
 phpmyadmin/.drone.yml
 phppgadmin/.drone.yml
 roundcube/.drone.yml
+shorewall/.drone.yml
 unoconv/.drone.yml
 unoserver/.drone.yml
