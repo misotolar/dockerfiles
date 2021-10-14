@@ -24,6 +24,7 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/asterisk
     dockerfile: asterisk/Dockerfile
+    cache_from: misotolar/asterisk:latest
     context: ./asterisk
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
