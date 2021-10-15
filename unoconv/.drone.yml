@@ -24,6 +24,7 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/unoconv
     dockerfile: unoconv/Dockerfile
+    cache_from: misotolar/unoconv:latest
     context: ./unoconv
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
@@ -38,4 +39,4 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/unoconv
     readme: unoconv/README.md
-    desc: "Unoconv Debian Buster image"
+    desc: "Unoconv Debian Bullseye image"

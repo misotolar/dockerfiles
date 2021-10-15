@@ -1,31 +1,31 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG URL=https://raw.githubusercontent.com/unoconv/unoconv/master/unoconv
+ARG URL=https://raw.githubusercontent.com/unoconv/unoconv/0.9.0/unoconv
+ARG SHA256=f5c33a280c3050025322935687bb0b7453dc1c205c0bbe2318ff55c735b007c0
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
+WORKDIR /usr/local/bin
+
 RUN set -ex; \
-    echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list; \
-    echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://security.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian bullseye main contrib non-free" | tee /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
         ca-certificates \
         curl \
-        tzdata; \
-    apt-get install -t buster-backports --no-install-recommends -y \
         libreoffice-calc-nogui \
-        libreoffice-core-nogui \
         libreoffice-writer-nogui \
         python3-uno; \
-    ln -fs /usr/bin/python3 /usr/local/bin/python; \
     curl -fsSL -o /usr/local/bin/unoconv ${URL}; \
+    echo "$SHA256 */usr/local/bin/unoconv" | sha256sum -c -; \
     chmod 755 /usr/local/bin/unoconv; \
+    ln -fs /usr/bin/python3 /usr/local/bin/python; \
     apt-get remove --purge -y \
         ca-certificates \
         curl; \
