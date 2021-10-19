@@ -16,7 +16,7 @@ steps:
   - git checkout $DRONE_COMMIT -b $DRONE_BRANCH
 
 - name: publish
-  image: plugins/docker
+  image: misotolar/drone-docker
   settings:
     username: 
       from_secret: DOCKER_USERNAME
@@ -24,6 +24,7 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/roundcube
     dockerfile: roundcube/Dockerfile
+    cache_from: misotolar/roundcube
     context: ./roundcube
     tags:
     - ${DRONE_COMMIT_SHA:0:8}

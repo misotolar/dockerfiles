@@ -1,11 +1,11 @@
-ARG ALPINE_VERSION=3.13
+ARG ALPINE_VERSION=3.14
 
 FROM php:7.4-fpm-alpine$ALPINE_VERSION
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.4.11
-ARG SHA256=ac7319070c305fc2c88c7723605562d8607030732beee931cdb4091cf05e69b7
+ARG VERSION=1.5.0
+ARG SHA256=2fdc7b1663e5e99706bff34093aa4731d4bf22a58cb555a2520ed1bde78d012c
 ARG URL=https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz
 
 ENV MAX_EXECUTION_TIME 300
