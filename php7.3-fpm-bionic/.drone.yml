@@ -16,7 +16,7 @@ steps:
   - git checkout $DRONE_COMMIT -b $DRONE_BRANCH
 
 - name: publish
-  image: plugins/docker
+  image: misotolar/drone-docker
   settings:
     username: 
       from_secret: DOCKER_USERNAME
@@ -24,13 +24,14 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/php7.3-fpm-bionic
     dockerfile: php7.3-fpm-bionic/Dockerfile
+    cache_from: misotolar/php7.3-fpm-bionic:latest
     context: ./php7.3-fpm-bionic
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
     - latest
 
 - name: update
-  image: misotolar/dockerhub-update
+  image: misotolar/drone-docker-update
   settings: 
     username: 
       from_secret: DOCKER_USERNAME
