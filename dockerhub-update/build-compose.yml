@@ -1,6 +1,0 @@
-services:
-    dockerhub-update:
-        build: .
-        container_name: dockerhub-update
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
