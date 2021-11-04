@@ -28,7 +28,6 @@ WORKDIR /usr/local/node-media-server
 
 RUN set -ex; \
     apk add --no-cache \
-        ffmpeg \
         gettext; \
     apk add --no-cache --virtual .fetch-deps \
         git; \
