@@ -44,6 +44,7 @@ RUN set -ex; \
         docker-ce-cli \
         git \
         gettext-base \
+        ffmpeg \
         iproute2 \
         joe \
         libevent-2.1-6 \
