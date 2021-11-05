@@ -1,6 +1,6 @@
 FROM golang:1.13-alpine AS build
 
-ARG VERSION=6ec5e7141117e1489faa378b1c00e459d789642d
+ARG VERSION=4d8c6281843234782c3c772aea51cbb0c8c0341a
 ARG URL=https://github.com/drone-plugins/drone-docker.git
 
 ARG CGO_ENABLED=0
