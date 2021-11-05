@@ -2,8 +2,8 @@ FROM alpine:3.14
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=0.11.4
-ARG SHA256=baf0b0edf2031fcf0b81fd9df4bb916c061d77378f9671d1a7060bf2906af207
+ARG VERSION=0.11.5
+ARG SHA256=4c80403d76365b258db930dd9c4ab8e65a2d4753309c7473bfc291ab289ce958
 ARG URL=https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz
 
 ARG BORINGSSL_VERSION=chromium-stable
