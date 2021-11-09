@@ -1,0 +1,6 @@
+services:
+    repman:
+        build: .
+        container_name: repman
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
