@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec chpst -u www-data /usr/local/bin/repman messenger:consume async --limit 50
