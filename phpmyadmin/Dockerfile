@@ -1,21 +1,18 @@
-ARG ALPINE_VERSION=3.13
-
-FROM php:8.0-fpm-alpine$ALPINE_VERSION
+FROM php:8.0-fpm-alpine3.14
 
 LABEL maintainer="michal@sotolar.com"
 
 ARG VERSION=5.1.1
 ARG SHA256=1964d7190223c11e89fa1b7970c618e3a3bae2e859f5f60383f64c3848ef6921
-ARG URL=https://files.phpmyadmin.net/phpMyAdmin/${VERSION}/phpMyAdmin-${VERSION}-all-languages.tar.xz
+ADD https://files.phpmyadmin.net/phpMyAdmin/${VERSION}/phpMyAdmin-${VERSION}-all-languages.tar.xz /usr/src/phpMyAdmin.tar.xz
 
-ENV MAX_EXECUTION_TIME 600
-ENV MEMORY_LIMIT 512M
-ENV UPLOAD_LIMIT 2048K
+ENV PHP_MAX_EXECUTION_TIME 600
+ENV PHP_MEMORY_LIMIT 512M
+ENV PHP_UPLOAD_LIMIT 2048K
+
+WORKDIR /usr/local/phpmyadmin
 
 RUN set -ex; \
-    apk add --no-cache \
-        bash \
-        tzdata; \
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         bzip2-dev \
@@ -56,14 +53,14 @@ RUN set -ex; \
     } > $PHP_INI_DIR/conf.d/session-strict.ini; \
     \
     { \
-        echo 'allow_url_fopen=Off'; \
-        echo 'max_execution_time=${MAX_EXECUTION_TIME}'; \
+        echo 'expose_php=off'; \
+        echo 'allow_url_fopen=off'; \
+        echo 'max_execution_time=${PHP_MAX_EXECUTION_TIME}'; \
         echo 'max_input_vars=10000'; \
-        echo 'memory_limit=${MEMORY_LIMIT}'; \
-        echo 'post_max_size=${UPLOAD_LIMIT}'; \
-        echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
+        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
+        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/phpmyadmin-misc.ini; \
-    curl -fsSL -o /usr/src/phpMyAdmin.tar.xz $URL; \
     echo "$SHA256 */usr/src/phpMyAdmin.tar.xz" | sha256sum -c -; \
     rm -rf \
         /usr/src/php.tar.xz \
@@ -76,7 +73,7 @@ COPY config.inc.php /etc/phpmyadmin/config.inc.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY exclude.txt /usr/src/phpMyAdmin.exclude
 
-VOLUME /var/www/html
+VOLUME /usr/local/phpmyadmin
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]

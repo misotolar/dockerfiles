@@ -16,13 +16,14 @@ steps:
   - git checkout $DRONE_COMMIT -b $DRONE_BRANCH
 
 - name: publish
-  image: plugins/docker
+  image: misotolar/drone-docker
   settings:
     username: 
       from_secret: DOCKER_USERNAME
     password:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/phpmyadmin
+    cache_from: misotolar/phpmyadmin:latest
     dockerfile: phpmyadmin/Dockerfile
     context: ./phpmyadmin
     tags:
@@ -30,7 +31,7 @@ steps:
     - latest
 
 - name: update
-  image: misotolar/dockerhub-update
+  image: misotolar/drone-docker-update
   settings: 
     username: 
       from_secret: DOCKER_USERNAME

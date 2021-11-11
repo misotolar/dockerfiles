@@ -23,8 +23,8 @@ $vars = array(
     'PMA_CONTROLPASS',
     'PMA_QUERYHISTORYDB',
     'PMA_QUERYHISTORYMAX',
-    'MAX_EXECUTION_TIME',
-    'MEMORY_LIMIT'
+    'PHP_MAX_EXECUTION_TIME',
+    'PHP_MEMORY_LIMIT'
 );
 foreach ($vars as $var) {
     $env = getenv($var);
@@ -138,12 +138,12 @@ $i--;
 $cfg['UploadDir'] = '';
 $cfg['SaveDir'] = '';
 
-if (isset($_ENV['MAX_EXECUTION_TIME'])) {
-    $cfg['ExecTimeLimit'] = $_ENV['MAX_EXECUTION_TIME'];
+if (isset($_ENV['PHP_MAX_EXECUTION_TIME'])) {
+    $cfg['ExecTimeLimit'] = $_ENV['PHP_MAX_EXECUTION_TIME'];
 }
 
-if (isset($_ENV['MEMORY_LIMIT'])) {
-    $cfg['MemoryLimit'] = $_ENV['MEMORY_LIMIT'];
+if (isset($_ENV['PHP_MEMORY_LIMIT'])) {
+    $cfg['MemoryLimit'] = $_ENV['PHP_MEMORY_LIMIT'];
 }
 
 /* Include User Defined Settings Hook */
