@@ -1,22 +1,21 @@
-ARG ALPINE_VERSION=3.13
-
-FROM php:7.4-fpm-alpine$ALPINE_VERSION
+FROM php:7.4-fpm-alpine3.14
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG RELEASE=7-13-0
+ARG VERSION=7-13-0
 ARG SHA256=8694707ebff7bf4357b2920dacf12344e2c6d62c8143dc0f65794f50756c90fd
-ARG URL=https://github.com/phppgadmin/phppgadmin/archive/REL_$RELEASE.tar.gz
+ADD https://github.com/phppgadmin/phppgadmin/archive/REL_${VERSION}.tar.gz /usr/src/phpPgAdmin.tar.gz
 
-ENV MAX_EXECUTION_TIME 600
-ENV MEMORY_LIMIT 512M
-ENV UPLOAD_LIMIT 2048K
+ENV PHP_MAX_EXECUTION_TIME 600
+ENV PHP_UPLOAD_LIMIT 2048K
+ENV PHP_MEMORY_LIMIT 512M
+
+WORKDIR /usr/local/phppgadmin
 
 RUN set -ex; \
     apk add --no-cache \
-        bash \
         postgresql-client \
-        tzdata; \
+    ; \
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         postgresql-dev \
@@ -34,27 +33,18 @@ RUN set -ex; \
     apk add --no-cache --virtual .phppgadmin-rundeps $runDeps; \
     apk del --no-network .build-deps; \
     { \
-        echo 'opcache.memory_consumption=128'; \
-        echo 'opcache.interned_strings_buffer=8'; \
-        echo 'opcache.max_accelerated_files=4000'; \
-        echo 'opcache.revalidate_freq=2'; \
-        echo 'opcache.fast_shutdown=1'; \
-    } > $PHP_INI_DIR/conf.d/opcache-recommended.ini; \
-    \
-    { \
         echo 'session.cookie_httponly=1'; \
         echo 'session.use_strict_mode=1'; \
     } > $PHP_INI_DIR/conf.d/session-strict.ini; \
     \
     { \
-        echo 'allow_url_fopen=Off'; \
-        echo 'max_execution_time=${MAX_EXECUTION_TIME}'; \
-        echo 'max_input_vars=10000'; \
-        echo 'memory_limit=${MEMORY_LIMIT}'; \
-        echo 'post_max_size=${UPLOAD_LIMIT}'; \
-        echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
-    } > $PHP_INI_DIR/conf.d/phpmyadmin-misc.ini; \
-    curl -fsSL -o /usr/src/phpPgAdmin.tar.gz $URL; \
+        echo 'expose_php=off'; \
+        echo 'allow_url_fopen=off'; \
+        echo 'max_execution_time=${PHP_MAX_EXECUTION_TIME}'; \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
+        echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
+        echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
+    } > $PHP_INI_DIR/conf.d/phppgadmin-misc.ini; \
     echo "$SHA256 */usr/src/phpPgAdmin.tar.gz" | sha256sum -c -; \
     rm -rf \
         /usr/src/php.tar.xz \
@@ -63,11 +53,11 @@ RUN set -ex; \
         /var/tmp/* \
         /tmp/*
 
-COPY config.inc.php /etc/phppgadmin/config.inc.php
+COPY config.inc.php /usr/local/etc/phppgadmin/config.inc.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY exclude.txt /usr/src/phpPgAdmin.exclude
 
-VOLUME /var/www/html
+VOLUME /usr/local/phppgadmin
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
