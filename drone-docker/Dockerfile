@@ -15,7 +15,7 @@ RUN set -ex; \
     git reset --hard ${VERSION}; \
     go build -v -ldflags "-X main.version=${VERSION:0:8}" -a -tags netgo -o release/linux/amd64/drone-docker ./cmd/drone-docker
 
-FROM docker:20.10.10-dind
+FROM docker:20.10.11-dind
 
 LABEL mantainer="michal@sotolar.com"
 
