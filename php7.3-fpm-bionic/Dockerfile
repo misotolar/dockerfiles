@@ -8,7 +8,7 @@ ENV PHP_USER_GECOS Ubuntu Bionic
 ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 7.3
-ENV PHP_PACKAGE_VERSION 7.3.31-2
+ENV PHP_PACKAGE_VERSION 7.3.33-1
 
 ENV PHP_DIO_VERSION 0.2.0
 ENV PHP_EVENT_VERSION 3.0.6
@@ -65,6 +65,7 @@ RUN set -ex; \
         libv4lconvert0 \
         minicom \
         msodbcsql17 \
+        odbc-mdbtools \
         php-pear \
         php${PHP_VERSION}-apcu \
         php${PHP_VERSION}-apcu-bc \
@@ -94,6 +95,9 @@ RUN set -ex; \
         xfce4-terminal \
         xprintidle; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
+    ln -fs /usr/lib/x86_64-linux-gnu/odbc/libmdbodbc.so /usr/lib/x86_64-linux-gnu/libmdbodbc.so; \
+    ln -fs /usr/lib/x86_64-linux-gnu/odbc/libmdbodbcW.so /usr/lib/x86_64-linux-gnu/libmdbodbcW.so; \
+    ln -fs /usr/lib/x86_64-linux-gnu/libodbccr.so.2.0.0 /usr/lib/x86_64-linux-gnu/libodbccr.so; \
     pecl channel-update pecl.php.net; \
     echo "\n\n\n\n\n\n\n\n" | pecl install \
         dio-${PHP_DIO_VERSION} \
