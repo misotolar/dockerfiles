@@ -1,16 +1,18 @@
-ARG ALPINE_VERSION=3.14
-
-FROM php:7.4-fpm-alpine$ALPINE_VERSION
+FROM php:7.4-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.5.0
-ARG SHA256=2fdc7b1663e5e99706bff34093aa4731d4bf22a58cb555a2520ed1bde78d012c
-ARG URL=https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz
+ARG VERSION=1.5.1
+ARG SHA256=611b0d80227d0b70289c715787b2d85fd15ed915eb56d585c104c24376036e83
+ADD https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz /usr/src/roundcubemail.tar.gz
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 ENV MAX_EXECUTION_TIME 300
 ENV MEMORY_LIMIT 64M
 ENV UPLOAD_LIMIT 2048K
+
+WORKDIR /usr/local/roundcube
 
 RUN set -ex; \
     apk add --no-cache \
@@ -82,29 +84,19 @@ RUN set -ex; \
         echo 'post_max_size=${UPLOAD_LIMIT}'; \
         echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/roundcube-misc.ini; \
-    curl -fsSL -o roundcubemail.tar.gz $URL; \
-    echo "$SHA256 *roundcubemail.tar.gz" | sha256sum -c -; \
-    mkdir -p /usr/src/roundcubemail; \
-    tar -xf roundcubemail.tar.gz -C /usr/src/roundcubemail --strip-components=1 --no-same-owner; \
-    chown -R www-data:www-data /usr/src/roundcubemail/logs; \
-    curl -fsSL -o /tmp/composer-installer.php https://getcomposer.org/installer; \
-    php /tmp/composer-installer.php --install-dir=/usr/local/bin; \
+    echo "$SHA256 */usr/src/roundcubemail.tar.gz" | sha256sum -c -; \
     rm -rf \
-        roundcube.tar.gz \
-        roundcube.tar.gz.asc \
         /usr/src/php.tar.xz \
         /usr/src/php.tar.xz.asc \
-        /usr/src/roundcubemail/installer \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*;
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY exclude.txt /usr/src/roundcubemail.exclude
+COPY config.inc.php /usr/src/config.inc.php
 
-VOLUME /var/www/html
-VOLUME /var/roundcube/config
-VOLUME /var/roundcube/db
-VOLUME /tmp/roundcube
+VOLUME /usr/local/roundcube
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm"]
