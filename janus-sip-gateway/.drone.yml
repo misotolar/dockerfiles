@@ -24,7 +24,7 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/janus-sip-gateway
     dockerfile: janus-sip-gateway/Dockerfile
-    cache_from: misotolar/janus-sip-gateway
+    cache_from: misotolar/janus-sip-gateway:latest
     context: ./janus-sip-gateway
     tags:
     - ${DRONE_COMMIT_SHA:0:8}

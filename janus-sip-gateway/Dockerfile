@@ -1,13 +1,13 @@
-FROM alpine:3.14
+FROM alpine:3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=0.11.5
-ARG SHA256=4c80403d76365b258db930dd9c4ab8e65a2d4753309c7473bfc291ab289ce958
+ARG VERSION=0.11.6
+ARG SHA256=b5fe70d95b9288200df15d5f75cb8eb6db66484c6ded159422a81e880ecb7104
 ARG URL=https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz
 
 ARG BORINGSSL_VERSION=chromium-stable
-ARG BORINGSSL_SHA256=0cfe2da3bc9999b11d01220570c7b3e6c4eb5e85c28c229cea7412e41a0ef430
+ARG BORINGSSL_SHA256=e8cd8caba44d8630d4c221ce79a130d6e67e5a7d3e01135f6b45a6a9c72bb51f
 ARG BORINGSSL_URL=https://github.com/google/boringssl/archive/refs/heads/${BORINGSSL_VERSION}.tar.gz
 
 ARG LIBNICE_VERSION=0.1.17
