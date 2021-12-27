@@ -1,0 +1,6 @@
+services:
+    tt-rss:
+        build: .
+        container_name: tt-rss
+        volumes:
+            - /etc/localtime:/etc/localtime:ro

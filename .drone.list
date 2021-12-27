@@ -18,5 +18,6 @@ phppgadmin/.drone.yml
 repman/.drone.yml
 roundcube/.drone.yml
 shorewall/.drone.yml
+tt-rss/.drone.yml
 unoconv/.drone.yml
 unoserver/.drone.yml
