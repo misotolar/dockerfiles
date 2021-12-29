@@ -1,6 +1,7 @@
 asterisk/.drone.yml
 drone-docker/.drone.yml
 drone-docker-update/.drone.yml
+drone-rsync/.drone.yml
 fontello/.drone.yml
 geoipupdate/.drone.yml
 janus-sip-gateway/.drone.yml

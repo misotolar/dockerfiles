@@ -1,0 +1,6 @@
+services:
+    drone-rsync:
+        build: .
+        container_name: drone-rsync
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
