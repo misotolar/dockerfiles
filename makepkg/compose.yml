@@ -1,0 +1,4 @@
+services:
+    makepkg:
+        build: .
+        container_name: makepkg

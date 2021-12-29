@@ -7,6 +7,7 @@ geoipupdate/.drone.yml
 janus-sip-gateway/.drone.yml
 jellyfin/.drone.yml
 jellyfin-server/.drone.yml
+makepkg/.drone.yml
 mjpg-streamer/.drone.yml
 node-media-server/.drone.yml
 openalpr/.drone.yml
