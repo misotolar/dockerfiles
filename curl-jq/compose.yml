@@ -1,0 +1,6 @@
+services:
+    curl-jq:
+        build: .
+        container_name: curl-jq
+        volumes:
+            - /etc/localtime:/etc/localtime:ro

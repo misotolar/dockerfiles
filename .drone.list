@@ -1,4 +1,5 @@
 asterisk/.drone.yml
+curl-jq/.drone.yml
 drone-docker/.drone.yml
 drone-docker-update/.drone.yml
 drone-rsync/.drone.yml
