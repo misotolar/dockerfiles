@@ -2,8 +2,8 @@ FROM php:7.4-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.5.1
-ARG SHA256=611b0d80227d0b70289c715787b2d85fd15ed915eb56d585c104c24376036e83
+ARG VERSION=1.5.2
+ARG SHA256=f03968381156fe790d858af7e069c5550a8577fb964f96624434895272053838
 ADD https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz /usr/src/roundcubemail.tar.gz
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -71,7 +71,7 @@ RUN set -ex; \
     } > $PHP_INI_DIR/conf.d/session-strict.ini; \
     \
     { \
-    echo 'session.auto_start=Off'; \
+        echo 'session.auto_start=off'; \
         echo 'session.gc_maxlifetime=21600'; \
         echo 'session.gc_divisor=500'; \
         echo 'session.gc_probability=1'; \
@@ -79,6 +79,7 @@ RUN set -ex; \
     } > $PHP_INI_DIR/conf.d/roundcube-defaults.ini; \
     \
     { \
+        echo 'expose_php=off'; \
         echo 'max_execution_time=${MAX_EXECUTION_TIME}'; \
         echo 'memory_limit=${MEMORY_LIMIT}'; \
         echo 'post_max_size=${UPLOAD_LIMIT}'; \
