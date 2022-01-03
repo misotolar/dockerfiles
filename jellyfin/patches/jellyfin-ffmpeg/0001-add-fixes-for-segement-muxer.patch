@@ -1,6 +1,7 @@
-diff -rupN ffmpeg-4.4.orig/libavformat/segment.c ffmpeg-4.4/libavformat/segment.c
---- ffmpeg-4.4.orig/libavformat/segment.c	2021-04-08 22:55:16.000000000 +0200
-+++ ffmpeg-4.4/libavformat/segment.c	2021-06-25 00:13:01.380492077 +0200
+Index: jellyfin-ffmpeg/libavformat/segment.c
+===================================================================
+--- jellyfin-ffmpeg.orig/libavformat/segment.c
++++ jellyfin-ffmpeg/libavformat/segment.c
 @@ -87,6 +87,7 @@ typedef struct SegmentContext {
      int64_t last_val;      ///< remember last time for wrap around detection
      int cut_pending;

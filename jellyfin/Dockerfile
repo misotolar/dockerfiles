@@ -1,6 +1,4 @@
-ARG ALPINE_VERSION=3.14
-
-FROM alpine:$ALPINE_VERSION as build
+FROM alpine:3.14 as build
 
 ARG FFMPEG_VERSION=4.4.1
 ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"

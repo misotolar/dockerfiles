@@ -1,205 +1,29 @@
-diff -rupN ffmpeg-4.4.orig/compat/cuda/cuda_runtime.h ffmpeg-4.4/compat/cuda/cuda_runtime.h
---- ffmpeg-4.4.orig/compat/cuda/cuda_runtime.h	2021-07-17 18:49:01.434571296 +0200
-+++ ffmpeg-4.4/compat/cuda/cuda_runtime.h	2021-07-17 18:53:23.389283764 +0200
-@@ -1,7 +1,7 @@
- /*
-  * Minimum CUDA compatibility definitions header
-  *
-- * Copyright (c) 2019 rcombs
-+ * Copyright (c) 2019 Rodger Combs
-  *
-  * This file is part of FFmpeg.
-  *
-@@ -33,55 +33,67 @@
- #define max(a, b) ((a) > (b) ? (a) : (b))
- #define min(a, b) ((a) < (b) ? (a) : (b))
- #define abs(x) ((x) < 0 ? -(x) : (x))
-+#define clamp(a, b, c) min(max((a), (b)), (c))
- 
- #define atomicAdd(a, b) (__atomic_fetch_add(a, b, __ATOMIC_SEQ_CST))
- 
- // Basic typedefs
- typedef __device_builtin__ unsigned long long cudaTextureObject_t;
- 
--typedef struct __device_builtin__ __align__(2) uchar2
--{
--    unsigned char x, y;
--} uchar2;
--
--typedef struct __device_builtin__ __align__(4) ushort2
--{
--    unsigned short x, y;
--} ushort2;
--
--typedef struct __device_builtin__ uint3
--{
--    unsigned int x, y, z;
--} uint3;
--
--typedef struct uint3 dim3;
--
--typedef struct __device_builtin__ __align__(8) int2
--{
--    int x, y;
--} int2;
--
--typedef struct __device_builtin__ __align__(4) uchar4
--{
--    unsigned char x, y, z, w;
--} uchar4;
-+#define MAKE_VECTORS(type, base) \
-+typedef struct __device_builtin__ type##1 { \
-+    base x; \
-+} type##1; \
-+static __inline__ __device__ type##1 make_##type##1(base x) { \
-+    type##1 ret; \
-+    ret.x = x; \
-+    return ret; \
-+} \
-+typedef struct __device_builtin__ __align__(sizeof(base) * 2) type##2 { \
-+    base x, y; \
-+} type##2; \
-+static __inline__ __device__ type##2 make_##type##2(base x, base y) { \
-+    type##2 ret; \
-+    ret.x = x; \
-+    ret.y = y; \
-+    return ret; \
-+} \
-+typedef struct __device_builtin__ type##3 { \
-+    base x, y, z; \
-+} type##3; \
-+static __inline__ __device__ type##3 make_##type##3(base x, base y, base z) { \
-+    type##3 ret; \
-+    ret.x = x; \
-+    ret.y = y; \
-+    ret.z = z; \
-+    return ret; \
-+} \
-+typedef struct __device_builtin__ __align__(sizeof(base) * 4) type##4 { \
-+    base x, y, z, w; \
-+} type##4; \
-+static __inline__ __device__ type##4 make_##type##4(base x, base y, base z, base w) { \
-+    type##4 ret; \
-+    ret.x = x; \
-+    ret.y = y; \
-+    ret.z = z; \
-+    ret.w = w; \
-+    return ret; \
-+}
- 
--typedef struct __device_builtin__ __align__(8) ushort4
--{
--    unsigned short x, y, z, w;
--} ushort4;
-+MAKE_VECTORS(uchar, unsigned char)
-+MAKE_VECTORS(ushort, unsigned short)
-+MAKE_VECTORS(int, int)
-+MAKE_VECTORS(uint, unsigned int)
-+MAKE_VECTORS(float, float)
- 
--typedef struct __device_builtin__ __align__(16) int4
--{
--    int x, y, z, w;
--} int4;
-+typedef struct __device_builtin__ uint3 dim3;
- 
- // Accessors for special registers
- #define GETCOMP(reg, comp) \
-     asm("mov.u32 %0, %%" #reg "." #comp ";" : "=r"(tmp)); \
-     ret.comp = tmp;
- 
--#define GET(name, reg) static inline __device__ uint3 name() {\
-+#define GET(name, reg) static __inline__ __device__ uint3 name() {\
-     uint3 ret; \
-     unsigned tmp; \
-     GETCOMP(reg, x) \
-@@ -99,14 +111,8 @@ GET(getThreadIdx, tid)
- #define blockDim (getBlockDim())
- #define threadIdx (getThreadIdx())
- 
--// Basic initializers (simple macros rather than inline functions)
--#define make_uchar2(a, b) ((uchar2){.x = a, .y = b})
--#define make_ushort2(a, b) ((ushort2){.x = a, .y = b})
--#define make_uchar4(a, b, c, d) ((uchar4){.x = a, .y = b, .z = c, .w = d})
--#define make_ushort4(a, b, c, d) ((ushort4){.x = a, .y = b, .z = c, .w = d})
--
- // Conversions from the tex instruction's 4-register output to various types
--#define TEX2D(type, ret) static inline __device__ void conv(type* out, unsigned a, unsigned b, unsigned c, unsigned d) {*out = (ret);}
-+#define TEX2D(type, ret) static __inline__ __device__ void conv(type* out, unsigned a, unsigned b, unsigned c, unsigned d) {*out = (ret);}
- 
- TEX2D(unsigned char, a & 0xFF)
- TEX2D(unsigned short, a & 0xFFFF)
-@@ -117,15 +123,46 @@ TEX2D(ushort4, make_ushort4((unsigned sh
- 
- // Template calling tex instruction and converting the output to the selected type
- template <class T>
--static inline __device__ T tex2D(cudaTextureObject_t texObject, float x, float y)
-+static __inline__ __device__ T tex2D(cudaTextureObject_t texObject, float x, float y)
-+{
-+    T ret;
-+    unsigned ret1, ret2, ret3, ret4;
-+    asm("tex.2d.v4.u32.f32 {%0, %1, %2, %3}, [%4, {%5, %6}];" :
-+        "=r"(ret1), "=r"(ret2), "=r"(ret3), "=r"(ret4) :
-+        "l"(texObject), "f"(x), "f"(y));
-+    conv(&ret, ret1, ret2, ret3, ret4);
-+    return ret;
-+}
-+
-+static __inline__ __device__ float __exp2f(float x)
-+{
-+    float ret;
-+    asm("ex2.approx.f32 %0, %1;" : "=f"(ret) : "f"(x));
-+    return ret;
-+}
-+
-+#define __expf(x) (__log2f((x) * 1.4427f))
-+
-+static __inline__ __device__ float __log2f(float x)
-+{
-+    float ret;
-+    asm("lg2.approx.f32 %0, %1;" : "=f"(ret) : "f"(x));
-+    return ret;
-+}
-+
-+#define __logf(x) (__log2f((x)) * 0.693147f)
-+#define __log10f(x) (__log2f((x) * 0.30103f))
-+
-+static __inline__ __device__ float __powf(float x, float y)
-+{
-+    return __exp2f(y * __log2f(x));
-+}
-+
-+static __inline__ __device__ float __sqrtf(float x)
- {
--  T ret;
--  unsigned ret1, ret2, ret3, ret4;
--  asm("tex.2d.v4.u32.f32 {%0, %1, %2, %3}, [%4, {%5, %6}];" :
--      "=r"(ret1), "=r"(ret2), "=r"(ret3), "=r"(ret4) :
--      "l"(texObject), "f"(x), "f"(y));
--  conv(&ret, ret1, ret2, ret3, ret4);
--  return ret;
-+    float ret;
-+    asm("sqrtf.approx.f32 %0, %1;" : "=f"(ret) : "f"(x));
-+    return ret;
- }
- 
--#endif /* COMPAT_CUDA_CUDA_RUNTIME_H */
-+#endif
-diff -rupN ffmpeg-4.4.orig/configure ffmpeg-4.4/configure
---- ffmpeg-4.4.orig/configure	2021-07-17 18:49:01.401237787 +0200
-+++ ffmpeg-4.4/configure	2021-07-17 18:54:01.406150589 +0200
-@@ -3057,6 +3057,8 @@ scale_cuda_filter_deps="ffnvcodec"
+Index: jellyfin-ffmpeg/configure
+===================================================================
+--- jellyfin-ffmpeg.orig/configure
++++ jellyfin-ffmpeg/configure
+@@ -3058,6 +3058,8 @@ scale_cuda_filter_deps="ffnvcodec"
  scale_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  thumbnail_cuda_filter_deps="ffnvcodec"
  thumbnail_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-+tonemap_cuda_filter_deps="ffnvcodec"
++tonemap_cuda_filter_deps="ffnvcodec const_nan"
 +tonemap_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
  transpose_npp_filter_deps="ffnvcodec libnpp"
  overlay_cuda_filter_deps="ffnvcodec"
  overlay_cuda_filter_deps_any="cuda_nvcc cuda_llvm"
-diff -rupN ffmpeg-4.4.orig/ffbuild/common.mak ffmpeg-4.4/ffbuild/common.mak
---- ffmpeg-4.4.orig/ffbuild/common.mak	2021-07-17 18:49:01.484571559 +0200
-+++ ffmpeg-4.4/ffbuild/common.mak	2021-07-17 18:54:29.252963876 +0200
+@@ -6251,7 +6253,7 @@ fi
+ if enabled cuda_nvcc; then
+     nvccflags="$nvccflags -ptx"
+ else
+-    nvccflags="$nvccflags -S -nocudalib -nocudainc --cuda-device-only -Wno-c++11-narrowing -include ${source_link}/compat/cuda/cuda_runtime.h"
++    nvccflags="$nvccflags -S -nocudalib -nocudainc --cuda-device-only -Wno-c++11-narrowing -std=c++14 -include ${source_link}/compat/cuda/cuda_runtime.h"
+     check_nvcc cuda_llvm
+ fi
+ 
+Index: jellyfin-ffmpeg/ffbuild/common.mak
+===================================================================
+--- jellyfin-ffmpeg.orig/ffbuild/common.mak
++++ jellyfin-ffmpeg/ffbuild/common.mak
 @@ -38,6 +38,7 @@ OBJCCFLAGS  = $(CPPFLAGS) $(CFLAGS) $(OB
  ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
  CXXFLAGS   := $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
@@ -208,10 +32,24 @@ diff -rupN ffmpeg-4.4.orig/ffbuild/common.mak ffmpeg-4.4/ffbuild/common.mak
  
  HOSTCCFLAGS = $(IFLAGS) $(HOSTCPPFLAGS) $(HOSTCFLAGS)
  LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
-diff -rupN ffmpeg-4.4.orig/libavfilter/allfilters.c ffmpeg-4.4/libavfilter/allfilters.c
---- ffmpeg-4.4.orig/libavfilter/allfilters.c	2021-07-17 18:49:01.407904489 +0200
-+++ ffmpeg-4.4/libavfilter/allfilters.c	2021-07-17 18:55:46.196703448 +0200
-@@ -430,6 +430,7 @@ extern AVFilter ff_vf_tmedian;
+Index: jellyfin-ffmpeg/libavfilter/Makefile
+===================================================================
+--- jellyfin-ffmpeg.orig/libavfilter/Makefile
++++ jellyfin-ffmpeg/libavfilter/Makefile
+@@ -448,6 +448,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
+ OBJS-$(CONFIG_TMIDEQUALIZER_FILTER)          += vf_tmidequalizer.o
+ OBJS-$(CONFIG_TMIX_FILTER)                   += vf_mix.o framesync.o
+ OBJS-$(CONFIG_TONEMAP_FILTER)                += vf_tonemap.o colorspace.o
++OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
++                                                cuda/host_util.o
+ OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o colorspace.o opencl.o \
+                                                 opencl/tonemap.o opencl/colorspace_common.o
+ OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
+Index: jellyfin-ffmpeg/libavfilter/allfilters.c
+===================================================================
+--- jellyfin-ffmpeg.orig/libavfilter/allfilters.c
++++ jellyfin-ffmpeg/libavfilter/allfilters.c
+@@ -429,6 +429,7 @@ extern AVFilter ff_vf_tmedian;
  extern AVFilter ff_vf_tmidequalizer;
  extern AVFilter ff_vf_tmix;
  extern AVFilter ff_vf_tonemap;
@@ -219,151 +57,11 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/allfilters.c ffmpeg-4.4/libavfilter/allfi
  extern AVFilter ff_vf_tonemap_opencl;
  extern AVFilter ff_vf_tonemap_vaapi;
  extern AVFilter ff_vf_tpad;
-diff -rupN ffmpeg-4.4.orig/libavfilter/colorspace.c ffmpeg-4.4/libavfilter/colorspace.c
---- ffmpeg-4.4.orig/libavfilter/colorspace.c	2021-07-17 18:49:01.407904489 +0200
-+++ ffmpeg-4.4/libavfilter/colorspace.c	2021-07-17 18:57:31.870595322 +0200
-@@ -17,6 +17,7 @@
-  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-  */
- 
-+#include "libavutil/avassert.h"
- #include "libavutil/frame.h"
- #include "libavutil/mastering_display_metadata.h"
- #include "libavutil/pixdesc.h"
-@@ -138,6 +139,33 @@ const struct LumaCoefficients *ff_get_lu
-     return coeffs;
- }
- 
-+static const struct PrimaryCoefficients color_primaries[AVCOL_PRI_NB] = {
-+    [AVCOL_PRI_BT709]     = { 0.640, 0.330, 0.300, 0.600, 0.150, 0.060 },
-+    [AVCOL_PRI_BT470M]    = { 0.670, 0.330, 0.210, 0.710, 0.140, 0.080 },
-+    [AVCOL_PRI_BT470BG]   = { 0.640, 0.330, 0.290, 0.600, 0.150, 0.060 },
-+    [AVCOL_PRI_SMPTE170M] = { 0.630, 0.340, 0.310, 0.595, 0.155, 0.070 },
-+    [AVCOL_PRI_SMPTE240M] = { 0.630, 0.340, 0.310, 0.595, 0.155, 0.070 },
-+    [AVCOL_PRI_SMPTE428]  = { 0.735, 0.265, 0.274, 0.718, 0.167, 0.009 },
-+    [AVCOL_PRI_SMPTE431]  = { 0.680, 0.320, 0.265, 0.690, 0.150, 0.060 },
-+    [AVCOL_PRI_SMPTE432]  = { 0.680, 0.320, 0.265, 0.690, 0.150, 0.060 },
-+    [AVCOL_PRI_FILM]      = { 0.681, 0.319, 0.243, 0.692, 0.145, 0.049 },
-+    [AVCOL_PRI_BT2020]    = { 0.708, 0.292, 0.170, 0.797, 0.131, 0.046 },
-+    [AVCOL_PRI_JEDEC_P22] = { 0.630, 0.340, 0.295, 0.605, 0.155, 0.077 },
-+};
-+
-+const struct PrimaryCoefficients *ff_get_color_primaries(enum AVColorPrimaries prm)
-+{
-+    const struct PrimaryCoefficients *p;
-+
-+    if (prm >= AVCOL_PRI_NB)
-+        return NULL;
-+    p = &color_primaries[prm];
-+    if (!p->xr)
-+        return NULL;
-+
-+    return p;
-+}
-+
- void ff_fill_rgb2yuv_table(const struct LumaCoefficients *coeffs,
-                            double rgb2yuv[3][3])
- {
-@@ -165,6 +193,52 @@ void ff_fill_rgb2yuv_table(const struct
-     rgb2yuv[2][2] = rscale * coeffs->cb;
- }
- 
-+int ff_get_range_off(int *off, int *y_rng, int *uv_rng,
-+                     enum AVColorRange rng, int depth)
-+{
-+    switch (rng) {
-+    case AVCOL_RANGE_UNSPECIFIED:
-+    case AVCOL_RANGE_MPEG:
-+        *off = 16 << (depth - 8);
-+        *y_rng = 219 << (depth - 8);
-+        *uv_rng = 224 << (depth - 8);
-+        break;
-+    case AVCOL_RANGE_JPEG:
-+        *off = 0;
-+        *y_rng = *uv_rng = (256 << (depth - 8)) - 1;
-+        break;
-+    default:
-+        return AVERROR(EINVAL);
-+    }
-+
-+    return 0;
-+}
-+
-+void ff_get_yuv_coeffs(int16_t out[3][3][8], double (*table)[3],
-+                       int depth, int y_rng, int uv_rng, int yuv2rgb)
-+{
-+#define N (yuv2rgb ? m : n)
-+#define M (yuv2rgb ? n : m)
-+    int rng, n, m, o;
-+    int bits = 1 << (yuv2rgb ? (depth - 1) : (29 - depth));
-+    for (rng = y_rng, n = 0; n < 3; n++, rng = uv_rng) {
-+        for (m = 0; m < 3; m++) {
-+            out[N][M][0] = lrint(bits * (yuv2rgb ? 28672 : rng) * table[N][M] / (yuv2rgb ? rng : 28672));
-+            for (o = 1; o < 8; o++)
-+                out[N][M][o] = out[N][M][0];
-+        }
-+    }
-+
-+    if (yuv2rgb) {
-+        av_assert2(out[0][1][0] == 0);
-+        av_assert2(out[2][2][0] == 0);
-+        av_assert2(out[0][0][0] == out[1][0][0]);
-+        av_assert2(out[0][0][0] == out[2][0][0]);
-+    } else {
-+        av_assert2(out[1][2][0] == out[2][0][0]);
-+    }
-+}
-+
- double ff_determine_signal_peak(AVFrame *in)
- {
-     AVFrameSideData *sd = av_frame_get_side_data(in, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
-diff -rupN ffmpeg-4.4.orig/libavfilter/colorspace.h ffmpeg-4.4/libavfilter/colorspace.h
---- ffmpeg-4.4.orig/libavfilter/colorspace.h	2021-07-17 18:49:01.404571138 +0200
-+++ ffmpeg-4.4/libavfilter/colorspace.h	2021-07-17 18:58:12.324142472 +0200
-@@ -45,8 +45,13 @@ void ff_fill_rgb2xyz_table(const struct
-                            double rgb2xyz[3][3]);
- 
- const struct LumaCoefficients *ff_get_luma_coefficients(enum AVColorSpace csp);
-+const struct PrimaryCoefficients *ff_get_color_primaries(enum AVColorPrimaries prm);
- void ff_fill_rgb2yuv_table(const struct LumaCoefficients *coeffs,
-                            double rgb2yuv[3][3]);
-+int ff_get_range_off(int *off, int *y_rng, int *uv_rng,
-+                     enum AVColorRange rng, int depth);
-+void ff_get_yuv_coeffs(int16_t out[3][3][8], double (*table)[3],
-+                       int depth, int y_rng, int uv_rng, int yuv2rgb);
- 
- double ff_determine_signal_peak(AVFrame *in);
- void ff_update_hdr_metadata(AVFrame *in, double peak);
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/cl_compat.h ffmpeg-4.4/libavfilter/cuda/cl_compat.h
---- ffmpeg-4.4.orig/libavfilter/cuda/cl_compat.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/cl_compat.h	2021-07-17 18:58:37.790943745 +0200
-@@ -0,0 +1,22 @@
-+/*
-+ * OpenCL-to-CUDA compatibility header
-+ *
-+ * Copyright (c) 2020 rcombs
-+ *
-+ * This file is part of FFmpeg.
-+ *
-+ * FFmpeg is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * FFmpeg is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with FFmpeg; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-+ */
-+
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/colorspace_common.h ffmpeg-4.4/libavfilter/cuda/colorspace_common.h
---- ffmpeg-4.4.orig/libavfilter/cuda/colorspace_common.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/colorspace_common.h	2021-07-17 19:00:20.851488473 +0200
-@@ -0,0 +1,230 @@
+Index: jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/colorspace_common.h
+@@ -0,0 +1,219 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -389,22 +87,27 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/colorspace_common.h ffmpeg-4.4/libav
 +#include "libavutil/pixfmt.h"
 +
 +#define ST2084_MAX_LUMINANCE 10000.0f
-+#define REFERENCE_WHITE 100.0f
 +
 +#define ST2084_M1 0.1593017578125f
 +#define ST2084_M2 78.84375f
 +#define ST2084_C1 0.8359375f
 +#define ST2084_C2 18.8515625f
 +#define ST2084_C3 18.6875f
-+#define SDR_AVG   0.25f
 +
-+extern const float3 luma_src, luma_dst;
-+extern const enum AVColorTransferCharacteristic trc_src, trc_dst;
-+extern const enum AVColorRange range_src, range_dst;
-+extern const enum AVChromaLocation chroma_loc_src, chroma_loc_dst;
-+extern const bool rgb2rgb_passthrough;
-+extern const float rgb2rgb_matrix[9];
-+extern const float yuv_matrix[9], rgb_matrix[9];
++#define ARIB_B67_A 0.17883277f
++#define ARIB_B67_B 0.28466892f
++#define ARIB_B67_C 0.55991073f
++
++#define FLOAT_EPS 1.175494351e-38f
++
++extern __constant__ const float ref_white;
++extern __constant__ const float3 luma_src, luma_dst;
++extern __constant__ const enum AVColorTransferCharacteristic trc_src, trc_dst;
++extern __constant__ const enum AVColorRange range_src, range_dst;
++extern __constant__ const enum AVChromaLocation chroma_loc_src, chroma_loc_dst;
++extern __constant__ const bool rgb2rgb_passthrough;
++extern __constant__ const float rgb2rgb_matrix[9];
++extern __constant__ const float yuv_matrix[9], rgb_matrix[9];
 +
 +static __inline__ __device__ float get_luma_dst(float3 c, const float3& luma_dst) {
 +    return luma_dst.x * c.x + luma_dst.y * c.y + luma_dst.z * c.z;
@@ -433,85 +136,69 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/colorspace_common.h ffmpeg-4.4/libav
 +    }
 +}
 +
++// linearizer for PQ/ST2084
 +static __inline__ __device__ float eotf_st2084(float x) {
-+    float p = __powf(x, 1.0f / ST2084_M2);
-+    float a = max(p -ST2084_C1, 0.0f);
-+    float b = max(ST2084_C2 - ST2084_C3 * p, 1e-6f);
-+    float c  = __powf(a / b, 1.0f / ST2084_M1);
-+    return x > 0.0f ? c * ST2084_MAX_LUMINANCE / REFERENCE_WHITE : 0.0f;
++    x = max(x, 0.0f);
++    float xpow = __powf(x, 1.0f / ST2084_M2);
++    float num = max(xpow - ST2084_C1, 0.0f);
++    float den = max(ST2084_C2 - ST2084_C3 * xpow, FLOAT_EPS);
++    x = __powf(num / den, 1.0f / ST2084_M1);
++    return x * ST2084_MAX_LUMINANCE / ref_white;
 +}
 +
++// delinearizer for PQ/ST2084
 +static __inline__ __device__ float inverse_eotf_st2084(float x) {
-+    float a = x;
-+    x *= REFERENCE_WHITE / ST2084_MAX_LUMINANCE;
-+    x = __powf(x, ST2084_M1);
-+    x = (ST2084_C1 + ST2084_C2 * x) / (1.0f + ST2084_C3 * x);
-+    return a > 0.0f ? __powf(x, ST2084_M2) : 0.0f;
++    x = max(x, 0.0f);
++    x *= ref_white / ST2084_MAX_LUMINANCE;
++    float xpow = __powf(x, ST2084_M1);
++#if 0
++    // Original formulation from SMPTE ST 2084:2014 publication.
++    float num = ST2084_C1 + ST2084_C2 * xpow;
++    float den = 1.0f + ST2084_C3 * xpow;
++    return __powf(num / den, ST2084_M2);
++#else
++    // More stable arrangement that avoids some cancellation error.
++    float num = (ST2084_C1 - 1.0f) + (ST2084_C2 - ST2084_C3) * xpow;
++    float den = 1.0f + ST2084_C3 * xpow;
++    return __powf(1.0f + num / den, ST2084_M2);
++#endif
 +}
 +
-+#define HLG_A 0.17883277f
-+#define HLG_B 0.28466892f
-+#define HLG_C 0.55991073f
-+
-+// linearizer for HLG
-+static __inline__ __device__ float inverse_oetf_hlg(float x) {
-+    float a = 4.0f * x * x;
-+    float b = __expf((x - HLG_C) / HLG_A) + HLG_B;
-+    return x < 0.5f ? a : b;
++static __inline__ __device__ float ootf_1_2(float x) {
++    return x > 0.0f ? __powf(x, 1.2f) : x;
 +}
 +
-+// delinearizer for HLG
-+static __inline__ __device__ float oetf_hlg(float x) {
-+    float a = 0.5f * __sqrtf(x);
-+    float b = HLG_A * __logf(x - HLG_B) + HLG_C;
-+    return x <= 1.0f ? a : b;
++static __inline__ __device__ float inverse_ootf_1_2(float x) {
++    return x > 0.0f ? __powf(x, 1.0f / 1.2f) : x;
 +}
 +
-+static __inline__ __device__ float3 ootf_hlg(float3 c, float peak) {
-+    float luma = get_luma_src(c, luma_src);
-+    float gamma =  1.2f + 0.42f * __log10f(peak * REFERENCE_WHITE / 1000.0f);
-+    gamma = max(1.0f, gamma);
-+    float factor = peak * __powf(luma, gamma - 1.0f) / __powf(12.0f, gamma);
-+    return c * factor;
++static __inline__ __device__ float oetf_arib_b67(float x) {
++    x = max(x, 0.0f);
++    return x <= (1.0f / 12.0f)
++           ? __sqrtf(3.0f * x)
++           : (ARIB_B67_A * __logf(12.0f * x - ARIB_B67_B) + ARIB_B67_C);
 +}
 +
-+static __inline__ __device__ float3 inverse_ootf_hlg(float3 c, float peak) {
-+    float gamma = 1.2f + 0.42f * __log10f(peak * REFERENCE_WHITE / 1000.0f);
-+    c = c * __powf(12.0f, gamma) / peak;
-+    c = c / __powf(get_luma_dst(c, luma_dst), (gamma - 1.0f) / gamma);
-+    return c;
++static __inline__ __device__ float inverse_oetf_arib_b67(float x) {
++    x = max(x, 0.0f);
++    return x <= 0.5f
++           ? (x * x) * (1.0f / 3.0f)
++           : (__expf((x - ARIB_B67_C) / ARIB_B67_A) + ARIB_B67_B) * (1.0f / 12.0f);
 +}
 +
-+static __inline__ __device__ float inverse_eotf_bt1886(float c) {
-+    return c < 0.0f ? 0.0f : __powf(c, 1.0f / 2.4f);
++// linearizer for HLG/ARIB-B67
++static __inline__ __device__ float eotf_arib_b67(float x) {
++    return ootf_1_2(inverse_oetf_arib_b67(x));
 +}
 +
-+static __inline__ __device__ float oetf_bt709(float c) {
-+    c = c < 0.0f ? 0.0f : c;
-+    float r1 = 4.5f * c;
-+    float r2 = 1.099f * __powf(c, 0.45f) - 0.099f;
-+    return c < 0.018f ? r1 : r2;
-+}
-+static __inline__ __device__ float inverse_oetf_bt709(float c) {
-+    float r1 = c / 4.5f;
-+    float r2 = __powf((c + 0.099f) / 1.099f, 1.0f / 0.45f);
-+    return c < 0.081f ? r1 : r2;
++// delinearizer for HLG/ARIB-B67
++static __inline__ __device__ float inverse_eotf_arib_b67(float x) {
++    return oetf_arib_b67(inverse_ootf_1_2(x));
 +}
 +
-+static __inline__ __device__ float3 ootf(float3 c, float peak)
-+{
-+    if (trc_src == AVCOL_TRC_ARIB_STD_B67)
-+        return ootf_hlg(c, peak);
-+    else
-+        return c;
-+}
-+
-+static __inline__ __device__ float3 inverse_ootf(float3 c, float peak)
-+{
-+    if (trc_dst == AVCOL_TRC_ARIB_STD_B67)
-+        return inverse_ootf_hlg(c, peak);
-+    else
-+        return c;
++// delinearizer for BT709, BT2020-10
++static __inline__ __device__ float inverse_eotf_bt1886(float x) {
++    return x > 0.0f ? __powf(x, 1.0f / 2.4f) : 0.0f;
 +}
 +
 +static __inline__ __device__ float linearize(float x)
@@ -519,7 +206,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/colorspace_common.h ffmpeg-4.4/libav
 +    if (trc_src == AVCOL_TRC_SMPTE2084)
 +        return eotf_st2084(x);
 +    else if (trc_src == AVCOL_TRC_ARIB_STD_B67)
-+        return inverse_oetf_hlg(x);
++        return eotf_arib_b67(x);
 +    else
 +        return x;
 +}
@@ -594,10 +281,11 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/colorspace_common.h ffmpeg-4.4/libav
 +}
 +
 +#endif /* AVFILTER_CUDA_COLORSPACE_COMMON_H */
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/host_util.c ffmpeg-4.4/libavfilter/cuda/host_util.c
---- ffmpeg-4.4.orig/libavfilter/cuda/host_util.c	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/host_util.c	2021-07-17 19:00:56.315009248 +0200
-@@ -0,0 +1,37 @@
+Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.c
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/host_util.c
+@@ -0,0 +1,35 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -630,15 +318,14 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/host_util.c ffmpeg-4.4/libavfilter/c
 +    dst->width  = src->width;
 +    dst->height = src->height;
 +
-+    dst->peak = ff_determine_signal_peak(src);
-+    dst->avg  = 0.f; //FIXME
-+
 +    return 0;
 +}
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/host_util.h ffmpeg-4.4/libavfilter/cuda/host_util.h
---- ffmpeg-4.4.orig/libavfilter/cuda/host_util.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/host_util.h	2021-07-17 19:01:21.595142865 +0200
-@@ -0,0 +1,28 @@
++
+Index: jellyfin-ffmpeg/libavfilter/cuda/host_util.h
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/host_util.h
+@@ -0,0 +1,29 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -667,9 +354,11 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/host_util.h ffmpeg-4.4/libavfilter/c
 +int ff_make_cuda_frame(FFCUDAFrame *dst, const AVFrame *src);
 +
 +#endif /* AVFILTER_CUDA_HOST_UTIL_H */
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/pixfmt.h ffmpeg-4.4/libavfilter/cuda/pixfmt.h
---- ffmpeg-4.4.orig/libavfilter/cuda/pixfmt.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/pixfmt.h	2021-07-17 19:02:38.468882513 +0200
++
+Index: jellyfin-ffmpeg/libavfilter/cuda/pixfmt.h
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/pixfmt.h
 @@ -0,0 +1,209 @@
 +/*
 + * This file is part of FFmpeg.
@@ -694,8 +383,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/pixfmt.h ffmpeg-4.4/libavfilter/cuda
 +
 +#include "shared.h"
 +
-+extern const enum AVPixelFormat fmt_src, fmt_dst;
-+extern const int depth_src, depth_dst;
++extern __constant__ const enum AVPixelFormat fmt_src, fmt_dst;
++extern __constant__ const int depth_src, depth_dst;
 +
 +// Single-sample read function
 +template<class T, int p>
@@ -880,9 +569,10 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/pixfmt.h ffmpeg-4.4/libavfilter/cuda
 +
 +#endif /* AVFILTER_CUDA_PIXFMT_H */
 +
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/shared.h ffmpeg-4.4/libavfilter/cuda/shared.h
---- ffmpeg-4.4.orig/libavfilter/cuda/shared.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/shared.h	2021-07-17 19:03:24.572459526 +0200
+Index: jellyfin-ffmpeg/libavfilter/cuda/shared.h
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/shared.h
 @@ -0,0 +1,32 @@
 +/*
 + * This file is part of FFmpeg.
@@ -911,35 +601,32 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/shared.h ffmpeg-4.4/libavfilter/cuda
 +
 +    int width, height;
 +
-+    float peak, avg;
++    float peak;
 +} FFCUDAFrame;
 +
 +#endif /* AVFILTER_CUDA_SHARED_H */
 +
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cuda/tonemap.cu
---- ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/tonemap.cu	2021-07-17 19:04:40.412861473 +0200
-@@ -0,0 +1,223 @@
+Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/tonemap.cu
+@@ -0,0 +1,201 @@
 +/*
-+ * Copyright (c) 2020 rcombs
++ * This file is part of FFmpeg.
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a
-+ * copy of this software and associated documentation files (the "Software"),
-+ * to deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
 + *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
 + *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 + */
 +
 +#include "colorspace_common.h"
@@ -947,9 +634,9 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +#include "tonemap.h"
 +#include "util.h"
 +
-+extern const enum TonemapAlgorithm tonemap_func;
-+extern const float tone_param;
-+extern const float desat_param;
++extern __constant__ const enum TonemapAlgorithm tonemap_func;
++extern __constant__ const float tone_param;
++extern __constant__ const float desat_param;
 +
 +#define mix(x, y, a) ((x) + ((y) - (x)) * (a))
 +
@@ -973,7 +660,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +float gamma(float s, float peak) {
 +    float p = s > 0.05f ? s / peak : 0.05f / peak;
 +    float v = __powf(p, 1.0f / tone_param);
-+    return s > 0.05f ? v : (s * v /0.05f);
++    return s > 0.05f ? v : (s * v / 0.05f);
 +}
 +
 +static __inline__ __device__
@@ -1000,7 +687,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +        return s;
 +
 +    a = -j * j * (peak - 1.0f) / (j * j - 2.0f * j + peak);
-+    b = (j * j - 2.0f * j * peak + peak) / max(peak - 1.0f, 1e-6f);
++    b = (j * j - 2.0f * j * peak + peak) / max(peak - 1.0f, FLOAT_EPS);
 +
 +    return (b * b + 2.0f * b * j + j * j) / (b - a) * (s + a) / (s + b);
 +}
@@ -1008,19 +695,19 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +static __inline__ __device__
 +float bt2390(float s, float peak, float dst_peak) {
 +    float peak_pq = inverse_eotf_st2084(peak);
-+    float scale = 1.0f / peak_pq;
++    float scale = peak_pq > 0.0f ? (1.0f / peak_pq) : 1.0f;
 +
 +    float s_pq = inverse_eotf_st2084(s) * scale;
-+    float maxLum = inverse_eotf_st2084(dst_peak) * scale;
++    float max_lum = inverse_eotf_st2084(dst_peak) * scale;
 +
-+    float ks = 1.5f * maxLum - 0.5f;
++    float ks = 1.5f * max_lum - 0.5f;
 +    float tb = (s_pq - ks) / (1.0f - ks);
 +    float tb2 = tb * tb;
 +    float tb3 = tb2 * tb;
 +    float pb = (2.0f * tb3 - 3.0f * tb2 + 1.0f) * ks +
 +               (tb3 - 2.0f * tb2 + tb) * (1.0f - ks) +
-+               (-2.0f * tb3 + 3.0f * tb2) * maxLum;
-+    float sig = (s_pq < ks) ? s_pq : pb;
++               (-2.0f * tb3 + 3.0f * tb2) * max_lum;
++    float sig = mix(pb, s_pq, s_pq < ks);
 +
 +    return eotf_st2084(sig * peak_pq);
 +}
@@ -1051,7 +738,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +
 +static __inline__ __device__
 +float3 map_one_pixel_rgb(float3 rgb, const FFCUDAFrame& src, const FFCUDAFrame& dst) {
-+    float sig = max(max(rgb.x, max(rgb.y, rgb.z)), 1e-6f);
++    float sig = max(max(rgb.x, max(rgb.y, rgb.z)), FLOAT_EPS);
 +    float peak = src.peak;
 +    float dst_peak = dst.peak;
 +
@@ -1065,40 +752,28 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +
 +    float sig_old = sig;
 +
-+    /*
-+    // Scale the signal to compensate for differences in the average brightness
-+    float slope = min(1.0f, dst.average / src.average);
-+    sig *= slope;
-+    peak *= slope;
-+    */
-+
 +    // Desaturate the color using a coefficient dependent on the signal level
 +    if (desat_param > 0.0f) {
 +        float luma = get_luma_dst(rgb, luma_dst);
-+        float coeff = max(sig - 0.18f, 1e-6f) / max(sig, 1e-6f);
++        float coeff = max(sig - 0.18f, FLOAT_EPS) / max(sig, FLOAT_EPS);
 +        coeff = __powf(coeff, 10.0f / desat_param);
 +        rgb = mix(rgb, make_float3(luma, luma, luma), make_float3(coeff, coeff, coeff));
-+        /*
-+        sig = mix(sig, luma * slope, coeff);
-+        */
 +    }
 +
 +    sig = map(sig, peak, dst_peak);
 +
 +    sig = min(sig, 1.0f);
-+    rgb = rgb * (sig/sig_old);
++    rgb = rgb * (sig / sig_old);
 +    return rgb;
 +}
 +
-+// map from source space YUV to destination space RGB
++// Map from source space YUV to destination space RGB
 +static __inline__ __device__
-+float3 map_to_dst_space_from_yuv(float3 yuv, float peak) {
++float3 map_to_dst_space_from_yuv(float3 yuv) {
 +    float3 c = yuv2lrgb(yuv);
-+    c = ootf(c, peak);
 +    c = lrgb2lrgb(c);
 +    return c;
 +}
-+
 +
 +extern "C" {
 +
@@ -1117,20 +792,15 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +        float3 yuv2 = read_px_flt(src, x,     y + 1);
 +        float3 yuv3 = read_px_flt(src, x + 1, y + 1);
 +
-+        float3 c0 = map_to_dst_space_from_yuv(yuv0, src.peak);
-+        float3 c1 = map_to_dst_space_from_yuv(yuv1, src.peak);
-+        float3 c2 = map_to_dst_space_from_yuv(yuv2, src.peak);
-+        float3 c3 = map_to_dst_space_from_yuv(yuv3, src.peak);
++        float3 c0 = map_to_dst_space_from_yuv(yuv0);
++        float3 c1 = map_to_dst_space_from_yuv(yuv1);
++        float3 c2 = map_to_dst_space_from_yuv(yuv2);
++        float3 c3 = map_to_dst_space_from_yuv(yuv3);
 +
 +        c0 = map_one_pixel_rgb(c0, src, dst);
 +        c1 = map_one_pixel_rgb(c1, src, dst);
 +        c2 = map_one_pixel_rgb(c2, src, dst);
 +        c3 = map_one_pixel_rgb(c3, src, dst);
-+
-+        c0 = inverse_ootf(c0, dst.peak);
-+        c1 = inverse_ootf(c1, dst.peak);
-+        c2 = inverse_ootf(c2, dst.peak);
-+        c3 = inverse_ootf(c3, dst.peak);
 +
 +        yuv0 = lrgb2yuv(c0);
 +        yuv1 = lrgb2yuv(c1);
@@ -1142,31 +812,27 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.cu ffmpeg-4.4/libavfilter/cu
 +}
 +
 +}
-+
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.h ffmpeg-4.4/libavfilter/cuda/tonemap.h
---- ffmpeg-4.4.orig/libavfilter/cuda/tonemap.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/tonemap.h	2021-07-17 19:05:04.322988208 +0200
-@@ -0,0 +1,39 @@
+Index: jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/tonemap.h
+@@ -0,0 +1,35 @@
 +/*
-+ * Copyright (c) 2020 rcombs
++ * This file is part of FFmpeg.
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a
-+ * copy of this software and associated documentation files (the "Software"),
-+ * to deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
 + *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
 + *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 + */
 +
 +#ifndef AVFILTER_CUDA_TONEMAP_H
@@ -1186,9 +852,10 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/tonemap.h ffmpeg-4.4/libavfilter/cud
 +
 +#endif /* AVFILTER_CUDA_TONEMAP_H */
 +
-diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/util.h ffmpeg-4.4/libavfilter/cuda/util.h
---- ffmpeg-4.4.orig/libavfilter/cuda/util.h	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/cuda/util.h	2021-07-17 19:05:35.556487096 +0200
+Index: jellyfin-ffmpeg/libavfilter/cuda/util.h
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/cuda/util.h
 @@ -0,0 +1,55 @@
 +/*
 + * This file is part of FFmpeg.
@@ -1245,46 +912,28 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/cuda/util.h ffmpeg-4.4/libavfilter/cuda/u
 +
 +#endif /* AVFILTER_CUDA_UTIL_H */
 +
-diff -rupN ffmpeg-4.4.orig/libavfilter/Makefile ffmpeg-4.4/libavfilter/Makefile
---- ffmpeg-4.4.orig/libavfilter/Makefile	2021-07-17 18:49:01.404571138 +0200
-+++ ffmpeg-4.4/libavfilter/Makefile	2021-07-17 18:55:06.099824850 +0200
-@@ -449,6 +449,8 @@ OBJS-$(CONFIG_TMEDIAN_FILTER)
- OBJS-$(CONFIG_TMIDEQUALIZER_FILTER)          += vf_tmidequalizer.o
- OBJS-$(CONFIG_TMIX_FILTER)                   += vf_mix.o framesync.o
- OBJS-$(CONFIG_TONEMAP_FILTER)                += vf_tonemap.o colorspace.o
-+OBJS-$(CONFIG_TONEMAP_CUDA_FILTER)           += vf_tonemap_cuda.o cuda/tonemap.ptx.o \
-+                                                cuda/host_util.o
- OBJS-$(CONFIG_TONEMAP_OPENCL_FILTER)         += vf_tonemap_opencl.o colorspace.o opencl.o \
-                                                 opencl/tonemap.o opencl/colorspace_common.o
- OBJS-$(CONFIG_TONEMAP_VAAPI_FILTER)          += vf_tonemap_vaapi.o vaapi_vpp.o
-diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/vf_tonemap_cuda.c
---- ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c	1970-01-01 01:00:00.000000000 +0100
-+++ ffmpeg-4.4/libavfilter/vf_tonemap_cuda.c	2021-07-17 19:08:58.307561780 +0200
-@@ -0,0 +1,627 @@
+Index: jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
+===================================================================
+--- /dev/null
++++ jellyfin-ffmpeg/libavfilter/vf_tonemap_cuda.c
+@@ -0,0 +1,720 @@
 +/*
-+* Copyright (c) 2017, NVIDIA CORPORATION. All rights reserved.
-+* Copyright (c) 2020 rcombs
-+*
-+* This file is part of FFmpeg.
-+*
-+* Permission is hereby granted, free of charge, to any person obtaining a
-+* copy of this software and associated documentation files (the "Software"),
-+* to deal in the Software without restriction, including without limitation
-+* the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+* and/or sell copies of the Software, and to permit persons to whom the
-+* Software is furnished to do so, subject to the following conditions:
-+*
-+* The above copyright notice and this permission notice shall be included in
-+* all copies or substantial portions of the Software.
-+*
-+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-+* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+* DEALINGS IN THE SOFTWARE.
-+*/
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
 +
 +#include <float.h>
 +#include <stdio.h>
@@ -1306,7 +955,6 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +#include "cuda/host_util.h"
 +#include "cuda/shared.h"
 +#include "cuda/tonemap.h"
-+#include "dither_matrix.h"
 +#include "formats.h"
 +#include "internal.h"
 +#include "scale_eval.h"
@@ -1318,6 +966,9 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    AV_PIX_FMT_P010,
 +    AV_PIX_FMT_P016
 +};
++
++#define REF_WHITE_BT2390 203.0f
++#define REF_WHITE_DEFAULT 100.0f
 +
 +#define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
 +#define ALIGN_UP(a, b) (((a) + (b) - 1) & ~((b) - 1))
@@ -1334,10 +985,10 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +
 +    enum AVPixelFormat in_fmt, out_fmt;
 +
-+    enum AVColorRange in_range, out_range;
-+    enum AVColorTransferCharacteristic in_trc, out_trc;
-+    enum AVColorSpace in_spc, out_spc;
-+    enum AVColorPrimaries in_pri, out_pri;
++    enum AVColorTransferCharacteristic trc, in_trc, out_trc;
++    enum AVColorSpace spc, in_spc, out_spc;
++    enum AVColorPrimaries pri, in_pri, out_pri;
++    enum AVColorRange range, in_range, out_range;
 +    enum AVChromaLocation in_chroma_loc, out_chroma_loc;
 +
 +    AVBufferRef *frames_ctx;
@@ -1360,9 +1011,11 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    CUdeviceptr dstBuffer;
 +
 +    enum TonemapAlgorithm tonemap;
++    double ref_white;
 +    double param;
 +    double desat_param;
 +    double peak;
++    double dst_peak;
 +    double scene_threshold;
 +
 +    const AVPixFmtDescriptor *in_desc, *out_desc;
@@ -1441,7 +1094,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +
 +    out_ctx->format    = AV_PIX_FMT_CUDA;
 +    out_ctx->sw_format = s->out_fmt;
-+    out_ctx->width     = FFALIGN(outlink->w,  32);
++    out_ctx->width     = FFALIGN(outlink->w, 32);
 +    out_ctx->height    = FFALIGN(outlink->h, 32);
 +
 +    ret = av_hwframe_ctx_init(out_ref);
@@ -1483,6 +1136,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +
 +    enum AVPixelFormat in_format;
 +    enum AVPixelFormat out_format;
++    const AVPixFmtDescriptor *in_desc;
++    const AVPixFmtDescriptor *out_desc;
 +    int ret;
 +
 +    /* check that we have a hw context */
@@ -1493,6 +1148,8 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    in_frames_ctx = (AVHWFramesContext*)ctx->inputs[0]->hw_frames_ctx->data;
 +    in_format     = in_frames_ctx->sw_format;
 +    out_format    = (s->format == AV_PIX_FMT_NONE) ? in_format : s->format;
++    in_desc       = av_pix_fmt_desc_get(in_format);
++    out_desc      = av_pix_fmt_desc_get(out_format);
 +
 +    if (!format_is_supported(in_format)) {
 +        av_log(ctx, AV_LOG_ERROR, "Unsupported input format: %s\n",
@@ -1504,9 +1161,17 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +               av_get_pix_fmt_name(out_format));
 +        return AVERROR(ENOSYS);
 +    }
++    if (!(in_desc->comp[0].depth == 10 ||
++        in_desc->comp[0].depth == 16)) {
++        av_log(ctx, AV_LOG_ERROR, "Unsupported input format depth: %d\n",
++               in_desc->comp[0].depth);
++        return AVERROR(ENOSYS);
++    }
 +
 +    s->in_fmt = in_format;
 +    s->out_fmt = out_format;
++    s->in_desc  = in_desc;
++    s->out_desc = out_desc;
 +
 +    ret = init_stage(s, in_frames_ctx->device_ref, outlink);
 +    if (ret < 0)
@@ -1554,14 +1219,43 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    size_t cubin_size;
 +    double rgb_matrix[3][3], yuv_matrix[3][3], rgb2rgb_matrix[3][3];
 +    const struct LumaCoefficients *in_coeffs, *out_coeffs;
-+    enum AVColorSpace in_spc = s->in_spc, out_spc = s->in_spc;
-+    enum AVColorPrimaries in_pri = s->in_pri, out_pri = s->out_pri;
 +    enum AVColorTransferCharacteristic in_trc = s->in_trc, out_trc = s->out_trc;
++    enum AVColorSpace in_spc = s->in_spc, out_spc = s->out_spc;
++    enum AVColorPrimaries in_pri = s->in_pri, out_pri = s->out_pri;
++    enum AVColorRange in_range = s->in_range, out_range = s->out_range;
 +    char info_log[4096], error_log[4096];
 +    CUjit_option options[] = {CU_JIT_INFO_LOG_BUFFER, CU_JIT_ERROR_LOG_BUFFER, CU_JIT_INFO_LOG_BUFFER_SIZE_BYTES, CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES};
 +    void *option_values[]  = {&info_log,              &error_log,              (void*)(intptr_t)sizeof(info_log), (void*)(intptr_t)sizeof(error_log)};
 +
 +    extern char tonemap_ptx[];
++
++    switch(s->tonemap) {
++    case TONEMAP_GAMMA:
++        if (isnan(s->param))
++            s->param = 1.8f;
++        break;
++    case TONEMAP_REINHARD:
++        if (!isnan(s->param))
++            s->param = (1.0f - s->param) / s->param;
++        break;
++    case TONEMAP_MOBIUS:
++        if (isnan(s->param))
++            s->param = 0.3f;
++        break;
++    }
++
++    if (isnan(s->param))
++        s->param = 1.0f;
++
++    s->ref_white = s->tonemap == TONEMAP_BT2390 ? REF_WHITE_BT2390
++                                                : REF_WHITE_DEFAULT;
++
++    s->dst_peak = 1.0f;
++
++    if (in_trc == AVCOL_TRC_UNSPECIFIED)
++        in_trc = AVCOL_TRC_SMPTE2084;
++    if (out_trc == AVCOL_TRC_UNSPECIFIED)
++        out_trc = AVCOL_TRC_BT709;
 +
 +    if (in_spc == AVCOL_SPC_UNSPECIFIED)
 +        in_spc = AVCOL_SPC_BT2020_NCL;
@@ -1573,10 +1267,23 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    if (out_pri == AVCOL_PRI_UNSPECIFIED)
 +        out_pri = AVCOL_PRI_BT709;
 +
-+    if (in_trc == AVCOL_TRC_UNSPECIFIED)
-+        in_trc = AVCOL_TRC_SMPTE2084;
-+    if (out_trc == AVCOL_TRC_UNSPECIFIED)
-+        out_trc = AVCOL_TRC_BT709;
++    if (in_range == AVCOL_RANGE_UNSPECIFIED)
++        in_range = AVCOL_RANGE_MPEG;
++    if (out_range == AVCOL_RANGE_UNSPECIFIED)
++        out_range = AVCOL_RANGE_MPEG;
++
++    av_log(ctx, AV_LOG_DEBUG, "Tonemapping transfer from %s to %s\n",
++           av_color_transfer_name(in_trc),
++           av_color_transfer_name(out_trc));
++    av_log(ctx, AV_LOG_DEBUG, "Mapping colorspace from %s to %s\n",
++           av_color_space_name(in_spc),
++           av_color_space_name(out_spc));
++    av_log(ctx, AV_LOG_DEBUG, "Mapping primaries from %s to %s\n",
++           av_color_primaries_name(in_pri),
++           av_color_primaries_name(out_pri));
++    av_log(ctx, AV_LOG_DEBUG, "Mapping range from %s to %s\n",
++           av_color_range_name(in_range),
++           av_color_range_name(out_range));
 +
 +    if (!(in_coeffs = ff_get_luma_coefficients(in_spc)))
 +        return AVERROR(EINVAL);
@@ -1610,17 +1317,18 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    CONSTANT(".f32 " a "[] = {%f, %f, %f}", \
 +             b->cr, b->cg, b->cb)
 +
-+    CONSTANT(".u32 depth_src      = %i", (int)s->in_desc ->comp[0].depth);
++    CONSTANT(".u32 depth_src      = %i", (int)s->in_desc->comp[0].depth);
 +    CONSTANT(".u32 depth_dst      = %i", (int)s->out_desc->comp[0].depth);
 +    CONSTANT(".u32 fmt_src        = %i", (int)s->in_fmt);
 +    CONSTANT(".u32 fmt_dst        = %i", (int)s->out_fmt);
-+    CONSTANT(".u32 range_src      = %i", (int)s->in_range);
-+    CONSTANT(".u32 range_dst      = %i", (int)s->out_range);
++    CONSTANT(".u32 range_src      = %i", (int)in_range);
++    CONSTANT(".u32 range_dst      = %i", (int)out_range);
 +    CONSTANT(".u32 trc_src        = %i", (int)in_trc);
 +    CONSTANT(".u32 trc_dst        = %i", (int)out_trc);
 +    CONSTANT(".u32 chroma_loc_src = %i", (int)s->in_chroma_loc);
 +    CONSTANT(".u32 chroma_loc_dst = %i", (int)s->out_chroma_loc);
 +    CONSTANT(".u32 tonemap_func   = %i", (int)s->tonemap);
++    CONSTANT(".f32 ref_white      = %f", s->ref_white);
 +    CONSTANT(".f32 tone_param     = %f", s->param);
 +    CONSTANT(".f32 desat_param    = %f", s->desat_param);
 +    CONSTANT_M("rgb_matrix", rgb_matrix);
@@ -1704,9 +1412,6 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    if (ret < 0)
 +        return ret;
 +
-+    s->in_desc  = av_pix_fmt_desc_get(s->in_fmt);
-+    s->out_desc = av_pix_fmt_desc_get(s->out_fmt);
-+
 +    outlink->sample_aspect_ratio = inlink->sample_aspect_ratio;
 +
 +    return 0;
@@ -1729,10 +1434,13 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    if (ret < 0)
 +        goto fail;
 +
-+    if (s->peak > 0)
-+        src.peak = s->peak;
++    src.peak = s->peak;
++    if (!src.peak) {
++        src.peak = ff_determine_signal_peak(in);
++        av_log(s, AV_LOG_DEBUG, "Computed signal peak: %f\n", src.peak);
++    }
 +
-+    dst.peak = 1.;
++    dst.peak = s->dst_peak;
 +
 +    ret = CHECK_CU(cu->cuLaunchKernel(s->cu_func,
 +                                      DIV_UP(src.width / 2, BLOCKX), DIV_UP(src.height / 2, BLOCKY), 1,
@@ -1767,6 +1475,18 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    if (ret < 0)
 +        return ret;
 +
++    if (s->out_trc        != out->color_trc ||
++        s->out_spc        != out->colorspace ||
++        s->out_pri        != out->color_primaries ||
++        s->out_range      != out->color_range ||
++        s->out_chroma_loc != out->chroma_location) {
++        out->color_trc       = s->out_trc;
++        out->colorspace      = s->out_spc;
++        out->color_primaries = s->out_pri;
++        out->color_range     = s->out_range;
++        out->chroma_location = s->out_chroma_loc;
++    }
++
 +    return 0;
 +}
 +
@@ -1787,22 +1507,30 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +        goto fail;
 +    }
 +
++    if (!(in->color_trc == AVCOL_TRC_SMPTE2084 ||
++        in->color_trc == AVCOL_TRC_ARIB_STD_B67)) {
++        av_log(ctx, AV_LOG_ERROR, "Unsupported input transfer characteristic: %s\n",
++               av_color_transfer_name(in->color_trc));
++        ret = AVERROR(EINVAL);
++        goto fail;
++    }
++
 +    if (!s->cu_func ||
-+        s->in_range      != in->color_range ||
 +        s->in_trc        != in->color_trc ||
-+        s->in_pri        != in->color_primaries ||
 +        s->in_spc        != in->colorspace ||
++        s->in_pri        != in->color_primaries ||
++        s->in_range      != in->color_range ||
 +        s->in_chroma_loc != in->chroma_location) {
-+        s->in_range      = in->color_range;
 +        s->in_trc        = in->color_trc;
-+        s->in_pri        = in->color_primaries;
 +        s->in_spc        = in->colorspace;
++        s->in_pri        = in->color_primaries;
++        s->in_range      = in->color_range;
 +        s->in_chroma_loc = in->chroma_location;
 +
-+        s->out_range      = AVCOL_RANGE_MPEG;
-+        s->out_trc        = AVCOL_TRC_BT709;
-+        s->out_pri        = AVCOL_PRI_BT709;
-+        s->out_spc        = AVCOL_SPC_BT709;
++        s->out_trc        = s->trc;
++        s->out_spc        = s->spc;
++        s->out_pri        = s->pri;
++        s->out_range      = s->range;
 +        s->out_chroma_loc = s->in_chroma_loc;
 +
 +        if ((ret = compile(link)) < 0)
@@ -1820,6 +1548,9 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +        goto fail;
 +
 +    av_frame_free(&in);
++
++    ff_update_hdr_metadata(out, s->dst_peak);
++
 +    return ff_filter_frame(outlink, out);
 +fail:
 +    av_frame_free(&in);
@@ -1839,11 +1570,29 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +    {     "hable",    0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_HABLE},             0, 0, FLAGS, "tonemap" },
 +    {     "mobius",   0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_MOBIUS},            0, 0, FLAGS, "tonemap" },
 +    {     "bt2390",   0, 0, AV_OPT_TYPE_CONST, {.i64 = TONEMAP_BT2390},            0, 0, FLAGS, "tonemap" },
-+    { "format", "Output format",       OFFSET(format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
-+    { "peak",      "signal peak override", OFFSET(peak), AV_OPT_TYPE_DOUBLE, {.dbl = 0}, 0, DBL_MAX, FLAGS },
-+    { "param",     "tonemap parameter",   OFFSET(param), AV_OPT_TYPE_DOUBLE, {.dbl = 0}, 0, DBL_MAX, FLAGS },
-+    { "desat",     "desaturation parameter",   OFFSET(desat_param), AV_OPT_TYPE_DOUBLE, {.dbl = 0.5}, 0, DBL_MAX, FLAGS },
-+    { "threshold", "scene detection threshold",   OFFSET(scene_threshold), AV_OPT_TYPE_DOUBLE, {.dbl = 0.2}, 0, DBL_MAX, FLAGS },
++    { "transfer",     "set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, {.i64 = AVCOL_TRC_BT709}, -1, INT_MAX, FLAGS, "transfer" },
++    { "t",            "set transfer characteristic", OFFSET(trc), AV_OPT_TYPE_INT, {.i64 = AVCOL_TRC_BT709}, -1, INT_MAX, FLAGS, "transfer" },
++    {     "bt709",    0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_TRC_BT709},           0, 0, FLAGS, "transfer" },
++    {     "bt2020",   0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_TRC_BT2020_10},       0, 0, FLAGS, "transfer" },
++    { "matrix",       "set colorspace matrix", OFFSET(spc), AV_OPT_TYPE_INT, {.i64 = AVCOL_SPC_BT709}, -1, INT_MAX, FLAGS, "matrix" },
++    { "m",            "set colorspace matrix", OFFSET(spc), AV_OPT_TYPE_INT, {.i64 = AVCOL_SPC_BT709}, -1, INT_MAX, FLAGS, "matrix" },
++    {     "bt709",    0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_SPC_BT709},           0, 0, FLAGS, "matrix" },
++    {     "bt2020",   0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_SPC_BT2020_NCL},      0, 0, FLAGS, "matrix" },
++    { "primaries",    "set color primaries", OFFSET(pri), AV_OPT_TYPE_INT, {.i64 = AVCOL_PRI_BT709}, -1, INT_MAX, FLAGS, "primaries" },
++    { "p",            "set color primaries", OFFSET(pri), AV_OPT_TYPE_INT, {.i64 = AVCOL_PRI_BT709}, -1, INT_MAX, FLAGS, "primaries" },
++    {     "bt709",    0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_PRI_BT709},           0, 0, FLAGS, "primaries" },
++    {     "bt2020",   0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_PRI_BT2020},          0, 0, FLAGS, "primaries" },
++    { "range",        "set color range", OFFSET(range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_MPEG}, -1, INT_MAX, FLAGS, "range" },
++    { "r",            "set color range", OFFSET(range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_MPEG}, -1, INT_MAX, FLAGS, "range" },
++    {     "tv",       0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_MPEG},          0, 0, FLAGS, "range" },
++    {     "pc",       0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_JPEG},          0, 0, FLAGS, "range" },
++    {     "limited",  0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_MPEG},          0, 0, FLAGS, "range" },
++    {     "full",     0, 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_RANGE_JPEG},          0, 0, FLAGS, "range" },
++    { "format",       "Output format",       OFFSET(format_str), AV_OPT_TYPE_STRING, { .str = "same" }, .flags = FLAGS },
++    { "peak",         "signal peak override", OFFSET(peak), AV_OPT_TYPE_DOUBLE, {.dbl = 0}, 0, DBL_MAX, FLAGS },
++    { "param",        "tonemap parameter",   OFFSET(param), AV_OPT_TYPE_DOUBLE, {.dbl = NAN}, DBL_MIN, DBL_MAX, FLAGS },
++    { "desat",        "desaturation parameter",   OFFSET(desat_param), AV_OPT_TYPE_DOUBLE, {.dbl = 0.5}, 0, DBL_MAX, FLAGS },
++    { "threshold",    "scene detection threshold",   OFFSET(scene_threshold), AV_OPT_TYPE_DOUBLE, {.dbl = 0.2}, 0, DBL_MAX, FLAGS },
 +    { NULL },
 +};
 +
@@ -1874,7 +1623,7 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +
 +AVFilter ff_vf_tonemap_cuda = {
 +    .name        = "tonemap_cuda",
-+    .description = NULL_IF_CONFIG_SMALL("GPU accelerated HDR-to-SDR tone mapping"),
++    .description = NULL_IF_CONFIG_SMALL("GPU accelerated HDR to SDR tonemapping"),
 +
 +    .init          = init,
 +    .uninit        = uninit,
@@ -1888,4 +1637,3 @@ diff -rupN ffmpeg-4.4.orig/libavfilter/vf_tonemap_cuda.c ffmpeg-4.4/libavfilter/
 +
 +    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
 +};
-\ No hay ningún carácter de nueva línea al final del fichero
