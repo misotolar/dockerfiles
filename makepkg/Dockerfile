@@ -14,6 +14,8 @@ USER build
 WORKDIR /home/build
 
 RUN set -ex; \
+    sudo chmod 0700 /home/build/.gnupg; \
+    sudo chown -R build:build /home/build/.gnupg; \
     git clone https://aur.archlinux.org/paru-bin.git; \
     cd paru-bin && makepkg --noconfirm --syncdeps --rmdeps --install --clean && cd ..; \
     rm -rf paru-bin

@@ -27,6 +27,12 @@ fi
 cp -r "$BUILD_PATH" /tmp/build
 cd /tmp/build
 
+source PKGBUILD
+if [[ ${#validpgpkeys[@]} > 0 ]]; then
+    echo '==> Fetching PGP keys...'
+    gpg --recv-keys ${validpgpkeys[@]}
+fi
+
 paru -U --noconfirm
 sudo chown "$(stat -c '%u:%g' "$BUILD_PATH"/PKGBUILD)" ./*pkg.tar*
 sudo mv ./*.pkg.tar* "$EXPORT_PATH"
