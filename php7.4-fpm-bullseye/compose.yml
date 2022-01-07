@@ -1,0 +1,6 @@
+services:
+    php7.4-fpm-buster:
+        build: .
+        container_name: php7.4-fpm-buster
+        environment:
+            - TZ=Europe/Madrid
