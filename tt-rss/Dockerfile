@@ -3,7 +3,7 @@ FROM php:8.0-fpm-alpine3.15
 LABEL maintainer="michal@sotolar.com"
 
 ARG VERSION=master
-ARG SHA256=5810abdde57daa282f470c0bb4c631596f6b6487a41ef8f27b10f0d2ad6407b0
+ARG SHA256=207c2f1cf05d9a826e0e739fca55a0843f1e68424c8e8066dac2b3fb9ca69183
 ADD https://git.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
 ARG TTRSS_NGINX_ACCEL_VERSION=master
