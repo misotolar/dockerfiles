@@ -27,6 +27,8 @@ fi
 cp -r "$BUILD_PATH" /tmp/build
 cd /tmp/build
 
+sudo pacman -Syu --noconfirm
+
 source PKGBUILD
 if [[ ${#validpgpkeys[@]} > 0 ]]; then
     echo '==> Fetching PGP keys...'
