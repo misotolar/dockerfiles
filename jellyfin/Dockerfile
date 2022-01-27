@@ -4,9 +4,9 @@ ARG FFMPEG_VERSION=4.4.1
 ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"
 ARG FFMPEG_SHA256=8fc9f20ac5ed95115a9e285647add0eedd5cc1a98a039ada14c132452f98ac42
 
-ARG MEDIASDK_VERSION=21.3.5
+ARG MEDIASDK_VERSION=22.1.0
 ARG MEDIASDK_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz"
-ARG MEDIASDK_SHA256=3f13869298d3946d7d91e58846e274ef62cd5af2473f59f36b57b2c27ebfd87c
+ARG MEDIASDK_SHA256=5ed1d22b5c5a05d3e848e43caa2b3966dbfb7f74281a646e6d0774a0621a9b8b
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
 ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
