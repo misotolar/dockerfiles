@@ -18,7 +18,8 @@ RUN set -ex; \
     apt-get install --no-install-recommends -y \
         ca-certificates \
         gnupg \
-        locales; \
+        locales \
+    ; \
     locale-gen "es_ES.UTF-8"; \
     echo "deb http://deb.debian.org/debian bullseye main contrib non-free" | tee /etc/apt/sources.list; \
     echo "deb http://deb.debian.org/debian bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
@@ -31,6 +32,7 @@ RUN set -ex; \
         curl \
         gettext-base \
         joe \
+        nodejs \
         php${PHP_VERSION}-apcu \
         php${PHP_VERSION}-apcu-bc \
         php${PHP_VERSION}-bcmath \
@@ -51,7 +53,8 @@ RUN set -ex; \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
         sudo \
-        tzdata; \
+        tzdata \
+    ; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
     curl -fsSL -o /tmp/sourceguardian.tar.gz http://www.sourceguardian.com/loaders/download/loaders.linux-x86_64.tar.gz; \
     tar xf /tmp/sourceguardian.tar.gz -C $(php-config --extension-dir) ixed.${PHP_VERSION}.lin; \
@@ -61,7 +64,8 @@ RUN set -ex; \
     apt-get remove --purge -y \
         curl \
         gnupg \
-        php${PHP_VERSION}-dev; \
+        php${PHP_VERSION}-dev \
+    ; \
     apt-get autoremove --purge -y; \
     apt-get clean autoclean -y; \
     rm -rf \
