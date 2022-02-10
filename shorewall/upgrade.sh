@@ -11,7 +11,7 @@ for FILENAME in $CURRENT/*.deb; do
     PACKAGE="${FILENAME##*/}"
     PACKAGE="${PACKAGE%%_*}"
 
-    /usr/bin/dpkg -l | /usr/bin/grep "$PACKAGE" | /usr/bin/grep -q ii && INSTALL+=("$FILENAME")
+    /usr/bin/dpkg -l | /bin/grep "$PACKAGE" | /bin/grep -q ii && INSTALL+=("$FILENAME")
 done
 
 if [[ ${INSTALL[@]} ]]; then
