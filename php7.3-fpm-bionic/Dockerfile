@@ -65,6 +65,7 @@ RUN set -ex; \
         libv4lconvert0 \
         minicom \
         msodbcsql17 \
+        nodejs \
         odbc-mdbtools \
         php-pear \
         php${PHP_VERSION}-apcu \
