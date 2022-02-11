@@ -2,8 +2,8 @@ FROM php:8.0-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=5.1.2
-ARG SHA256=3aaaa86ded6308f511f67a907c0d7d6096e1dc2a8ae05581ba55a2510abde1e4
+ARG VERSION=5.1.3
+ARG SHA256=c562feddc0f8ff5e69629113f273a0d024a65fb928c48e89ce614744d478296f
 ADD https://files.phpmyadmin.net/phpMyAdmin/${VERSION}/phpMyAdmin-${VERSION}-all-languages.tar.xz /usr/src/phpMyAdmin.tar.xz
 
 ENV PHP_MAX_EXECUTION_TIME 600
