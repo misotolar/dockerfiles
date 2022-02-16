@@ -24,6 +24,7 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/geoipupdate
     dockerfile: geoipupdate/Dockerfile
+    cache_from: misotolar/geoipupdate:latest
     context: ./geoipupdate
     tags:
     - ${DRONE_COMMIT_SHA:0:8}

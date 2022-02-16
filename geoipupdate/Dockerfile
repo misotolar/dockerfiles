@@ -1,10 +1,10 @@
-FROM alpine:3.14
+FROM alpine:3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=4.8.0
-ARG SHA256=c9d3c8f80e955125c4ee208b0cb0c219342ee602a7e55c3a5dfd63c5a32b1062
-ARG URL=https://github.com/maxmind/geoipupdate/releases/download/v${VERSION}/geoipupdate_${VERSION}_linux_amd64.tar.gz
+ARG VERSION=4.9.0
+ARG SHA256=14501fdeacbe942d4668248f89fb6b97d7096d73a1b59bce63d3db7b85e82bcb
+ADD https://github.com/maxmind/geoipupdate/releases/download/v${VERSION}/geoipupdate_${VERSION}_linux_amd64.tar.gz /tmp/geoipupdate.tar.gz
 
 ENV GEOIPUPDATE_ACCOUNT_ID 0
 ENV GEOIPUPDATE_LICENSE_KEY 000000000000
@@ -19,32 +19,22 @@ RUN set -ex; \
         ca-certificates \
         curl \
         libintl \
-        perl \
-        unzip; \
+        perl-net-cidr-lite \
+        perl-text-csv_xs \
+        unzip \
+    ; \
     apk add --no-cache --virtual .build-deps \
-        curl \
         gettext \
-        make \
-        g++ \
-        musl-dev \
-        perl-dev \
-        wget; \
-    curl -fsSL -o /tmp/cpanm http://xrl.us/cpanm; \
-    chmod 755 /tmp/cpanm; \
-    /tmp/cpanm -v Text::CSV_XS; \
-    /tmp/cpanm Net::CIDR::Lite; \
-    curl -fsSL -o geoipupdate.tar.gz $URL; \
-    echo "$SHA256  geoipupdate.tar.gz" | sha256sum -c -; \
+    ; \
+    echo "$SHA256  /tmp/geoipupdate.tar.gz" | sha256sum -c -; \
     tar --extract \
-        --file=geoipupdate.tar.gz \
+        --file=/tmp/geoipupdate.tar.gz \
         --directory=/usr/local/bin \
         --strip-components=1 \
         geoipupdate_${VERSION}_linux_amd64/geoipupdate; \
     cp /usr/bin/envsubst /usr/local/bin/envsubst; \
     apk del --no-network .build-deps; \
     rm -rf \
-        geoipupdate.tar.gz \
-        /root/.cpanm \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*
