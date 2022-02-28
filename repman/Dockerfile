@@ -2,8 +2,8 @@ FROM php:7.4-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.3.6
-ARG SHA256=ee60587edf614950df47442cf0a2316c1e0546558a16dd72026750d72f1443dd
+ARG VERSION=1.4.0
+ARG SHA256=718480be5f5e2b4d5fa9702f2e4e62c02e67928da2f360e0d99def99b0bbf84e
 ADD https://github.com/repman-io/repman/archive/refs/tags/${VERSION}.tar.gz /usr/src/repman.tar.gz
 
 ENV APP_ENV prod
