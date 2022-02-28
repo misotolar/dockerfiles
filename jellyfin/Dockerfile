@@ -1,12 +1,12 @@
 FROM alpine:3.14 as build
 
-ARG FFMPEG_VERSION=4.4.1
-ARG FFMPEG_URL="https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2"
-ARG FFMPEG_SHA256=8fc9f20ac5ed95115a9e285647add0eedd5cc1a98a039ada14c132452f98ac42
-
 ARG MEDIASDK_VERSION=22.1.0
-ARG MEDIASDK_URL="https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz"
 ARG MEDIASDK_SHA256=5ed1d22b5c5a05d3e848e43caa2b3966dbfb7f74281a646e6d0774a0621a9b8b
+ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
+
+ARG FFMPEG_VERSION=4.4.1
+ARG FFMPEG_SHA256=8fc9f20ac5ed95115a9e285647add0eedd5cc1a98a039ada14c132452f98ac42
+ADD https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 /tmp/ffmpeg.tar.bz2
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
 ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
@@ -70,9 +70,8 @@ RUN set -ex; \
 WORKDIR /tmp/mediasdk
 
 RUN set -ex; \
-    curl -fsSL -o mediasdk.tar.gz $MEDIASDK_URL; \
-    echo "$MEDIASDK_SHA256  mediasdk.tar.gz" | sha256sum --status -c -; \
-    tar xf mediasdk.tar.gz --strip-components=1; \
+    echo "$MEDIASDK_SHA256  ../mediasdk.tar.gz" | sha256sum --status -c -; \
+    tar xf ../mediasdk.tar.gz --strip-components=1; \
     mkdir build; \
     cd build; \
     cmake \
@@ -92,9 +91,8 @@ WORKDIR /tmp/ffmpeg
 ADD patches/jellyfin-ffmpeg/*.patch /tmp/ffmpeg/patches/
 
 RUN set -ex; \
-    curl -fsSL -o ffmpeg.tar.bz2 $FFMPEG_URL; \
-    echo "$FFMPEG_SHA256  ffmpeg.tar.bz2" | sha256sum --status -c -; \
-    tar xf ffmpeg.tar.bz2 --strip-components=1; \
+    echo "$FFMPEG_SHA256  ../ffmpeg.tar.bz2" | sha256sum --status -c -; \
+    tar xf ../ffmpeg.tar.bz2 --strip-components=1; \
     cat patches/*.patch | patch -p1; \
     ./configure \
         --disable-doc \
