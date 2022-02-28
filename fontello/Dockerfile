@@ -1,4 +1,4 @@
-FROM node:14-buster-slim AS ttfautohint_build
+FROM node:14-bullseye-slim AS ttfautohint_build
 
 ARG VERSION=1.8.3.1
 ARG URL=https://github.com/source-foundry/ttfautohint-build.git
@@ -9,9 +9,9 @@ ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 WORKDIR /build/ttfautohint
 
 RUN set -ex; \
-    echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list; \
-    echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://security.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian bullseye main contrib non-free" | tee /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
@@ -27,9 +27,9 @@ RUN set -ex; \
     git clone --depth 10 -b v$VERSION -c advice.detachedHead=false $URL /build/ttfautohint; \
     make
 
-FROM node:14-buster-slim AS build
+FROM node:14-bullseye-slim AS build
 
-ARG VERSION=e5bc7d2c8d73b9f97f5bf30fe5ce451afee08fa3
+ARG VERSION=2f11fe0201c3d4c748942a859c0c69feb8130802
 ARG URL=https://github.com/fontello/fontello.git
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -41,9 +41,9 @@ ARG NODECA_ENV=production
 WORKDIR /build
 
 RUN set -ex; \
-    echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list; \
-    echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://security.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian bullseye main contrib non-free" | tee /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
@@ -55,7 +55,7 @@ RUN set -ex; \
     /build/server.js assets; \
     rm -rf /build/.git
 
-FROM node:14-buster-slim
+FROM node:14-bullseye-slim
 
 LABEL mantainer="michal@sotolar.com"
 
@@ -67,9 +67,9 @@ COPY --from=ttfautohint_build /root/ttfautohint-build/local /usr
 COPY --from=build /build /usr/local/fontello
 
 RUN set -ex; \
-    echo "deb http://deb.debian.org/debian buster main contrib non-free" | tee /etc/apt/sources.list; \
-    echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://security.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian bullseye main contrib non-free" | tee /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
+    echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
