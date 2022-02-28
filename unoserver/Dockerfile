@@ -35,6 +35,7 @@ RUN set -ex; \
         /var/tmp/* \
         /tmp/*
 
+COPY javasettings.xml /usr/lib/libreoffice/share/config/javasettings_Linux_X86_64.xml
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 STOPSIGNAL SIGKILL
