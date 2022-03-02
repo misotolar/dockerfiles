@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec chpst -u www-data /usr/local/bin/php /usr/local/tt-rss/update_daemon2.php

@@ -3,15 +3,15 @@ FROM php:8.0-fpm-alpine3.15
 LABEL maintainer="michal@sotolar.com"
 
 ARG VERSION=master
-ARG SHA256=b55f6ef3ec5e0426e7f8417dda18dd0e38bdeb2e242465f81e99449350b17fd8
+ARG SHA256=ac03c8d5dbe886ef0386af28a77d449da6eb4f6c1761db964632fa26bf264f23
 ADD https://git.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
 ARG TTRSS_NGINX_ACCEL_VERSION=master
 ARG TTRSS_NGINX_ACCEL_SHA256=18baf5643407786817b09016658d9ef1cafd7d95805da120c6efc25b4b61abe1
 ADD https://git.tt-rss.org/fox/ttrss-nginx-xaccel/archive/$TTRSS_NGINX_ACCEL_VERSION.tar.gz /usr/src/ttrss-nginx-xaccel.tar.gz
 
-ENV MAX_EXECUTION_TIME 300
-ENV MEMORY_LIMIT 64M
+ENV PHP_MAX_EXECUTION_TIME 300
+ENV PHP_MEMORY_LIMIT 64M
 
 ENV TTRSS_MYSQL_CHARSET="UTF8"
 ENV TTRSS_PHP_EXECUTABLE="/usr/local/bin/php"
@@ -25,7 +25,6 @@ RUN set -ex; \
         ca-certificates \
         coreutils \
         rsync \
-        runit \
         sudo \
         tzdata \
     ; \
@@ -81,10 +80,8 @@ RUN set -ex; \
     \
     { \
         echo 'expose_php=off'; \
-        echo 'max_execution_time=${MAX_EXECUTION_TIME}'; \
-        echo 'memory_limit=${MEMORY_LIMIT}'; \
-        echo 'post_max_size=${UPLOAD_LIMIT}'; \
-        echo 'upload_max_filesize=${UPLOAD_LIMIT}'; \
+        echo 'max_execution_time=${PHP_MAX_EXECUTION_TIME}'; \
+        echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/tt-rss-misc.ini; \
     echo "$SHA256 */usr/src/tt-rss.tar.gz" | sha256sum -c -; \
     echo "$TTRSS_NGINX_ACCEL_SHA256 */usr/src/ttrss-nginx-xaccel.tar.gz" | sha256sum -c -; \
@@ -100,9 +97,8 @@ WORKDIR /usr/local/tt-rss
 COPY config.php /etc/tt-rss/config.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY exclude.txt /usr/src/tt-rss.exclude
-COPY service /etc/service
 
 VOLUME /usr/local/tt-rss
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["runsvdir", "-P", "/etc/service"]
+CMD ["php-fpm"]
