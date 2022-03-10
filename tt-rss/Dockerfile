@@ -2,13 +2,13 @@ FROM php:8.0-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=master
-ARG SHA256=ac03c8d5dbe886ef0386af28a77d449da6eb4f6c1761db964632fa26bf264f23
-ADD https://git.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
+ARG VERSION=95431890bea57c6fcc3f6198a7a27b1993f3fba4
+ARG SHA256=17e6dfd342e125ac2091145ca52f40a6380619180d12774a2378ee0709d3d4d4
+ADD https://git-gitea.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
-ARG TTRSS_NGINX_ACCEL_VERSION=master
+ARG TTRSS_NGINX_ACCEL_VERSION=e7d3a2855c5f4d97bc7ab53a415e35dfd35745fe
 ARG TTRSS_NGINX_ACCEL_SHA256=18baf5643407786817b09016658d9ef1cafd7d95805da120c6efc25b4b61abe1
-ADD https://git.tt-rss.org/fox/ttrss-nginx-xaccel/archive/$TTRSS_NGINX_ACCEL_VERSION.tar.gz /usr/src/ttrss-nginx-xaccel.tar.gz
+ADD https://git-gitea.tt-rss.org/fox/ttrss-nginx-xaccel/archive/$TTRSS_NGINX_ACCEL_VERSION.tar.gz /usr/src/ttrss-nginx-xaccel.tar.gz
 
 ENV PHP_MAX_EXECUTION_TIME 300
 ENV PHP_MEMORY_LIMIT 64M
