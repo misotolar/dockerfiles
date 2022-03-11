@@ -1,7 +1,8 @@
-FROM golang:1.13-alpine AS build
+FROM golang:1.17-alpine AS build
 
-ARG VERSION=4d8c6281843234782c3c772aea51cbb0c8c0341a
-ARG URL=https://github.com/drone-plugins/drone-docker.git
+ARG VERSION=20.11.0
+ARG SHA256=5d731f68424ec229330ba682a63abd0ddcd4565133d40879904a57808cd44610
+ADD https://github.com/drone-plugins/drone-docker/archive/refs/tags/v${VERSION}.tar.gz /tmp/drone-docker.tar.gz
 
 ARG CGO_ENABLED=0
 ARG GO111MODULE=on
@@ -9,13 +10,11 @@ ARG GO111MODULE=on
 WORKDIR /build
 
 RUN set -ex; \
-    apk add --no-cache --upgrade \
-        git; \
-    git clone ${URL} --depth=1 .; \
-    git reset --hard ${VERSION}; \
+    echo "$SHA256 */tmp/drone-docker.tar.gz" | sha256sum -c -; \
+    tar xf /tmp/drone-docker.tar.gz --strip-components=1; \
     go build -v -ldflags "-X main.version=${VERSION:0:8}" -a -tags netgo -o release/linux/amd64/drone-docker ./cmd/drone-docker
 
-FROM docker:20.10.12-dind
+FROM docker:20.10.13-dind
 
 LABEL mantainer="michal@sotolar.com"
 
