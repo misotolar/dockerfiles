@@ -2,8 +2,9 @@ ARG NODE_VERSION=lts
 
 FROM node:$NODE_VERSION-alpine
 
-ARG VERSION=95bfc0659448d8e8e57d9014cf14039475af1496
-ARG URL=https://github.com/misotolar/Node-Media-Server
+ARG VERSION=107d5d5b11fac6198e5196d10b725e2afc92fcd5
+ARG SHA256=d5d921a333bad1e32ac544414e15fe4c190a92605e9dc674d3cddaffeba8c1f7
+ADD https://github.com/misotolar/Node-Media-Server/archive/${VERSION}.tar.gz /tmp/node-media-server.tar.gz
 
 ENV APP_RTMP_PORT 1935
 ENV APP_RTMP_HOST 0.0.0.0
@@ -29,12 +30,9 @@ WORKDIR /usr/local/node-media-server
 RUN set -ex; \
     apk add --no-cache \
         gettext; \
-    apk add --no-cache --virtual .fetch-deps \
-        git; \
-    git clone $URL --depth=1 .; \
-    git reset --hard $VERSION; \
+    echo "$SHA256 */tmp/node-media-server.tar.gz" | sha256sum -c -; \
+    tar xf /tmp/node-media-server.tar.gz --strip-components=1; \
     npm i; \
-    apk del --no-network .fetch-deps; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
