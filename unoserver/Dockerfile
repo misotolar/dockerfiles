@@ -2,7 +2,7 @@ FROM debian:bullseye-slim
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.1
+ARG VERSION=1.2
 
 ENV INTERFACE=127.0.0.1
 ENV PORT=2002
