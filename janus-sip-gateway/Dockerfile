@@ -4,33 +4,33 @@ LABEL maintainer="michal@sotolar.com"
 
 ARG VERSION=1.0.0
 ARG SHA256=8b126f554c416767b2aa4c5fe957bfd3ba9326369cf05b312ceca96cd715c310
-ARG URL=https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz
+ADD https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz /tmp/janus-gateway.tar.gz
 
 ARG BORINGSSL_VERSION=chromium-stable
 ARG BORINGSSL_SHA256=e8cd8caba44d8630d4c221ce79a130d6e67e5a7d3e01135f6b45a6a9c72bb51f
-ARG BORINGSSL_URL=https://github.com/google/boringssl/archive/refs/heads/${BORINGSSL_VERSION}.tar.gz
+ADD https://github.com/google/boringssl/archive/refs/heads/${BORINGSSL_VERSION}.tar.gz /tmp/boringssl.tar.gz
 
-ARG LIBNICE_VERSION=0.1.17
-ARG LIBNICE_SHA256=47f6b4f4fe2a606e795e06225540f838ad39fa01d7333b8d4f723297860ca8b6
-ARG LIBNICE_URL=https://github.com/libnice/libnice/archive/refs/tags/${LIBNICE_VERSION}.tar.gz
+ARG LIBNICE_VERSION=0.1.18
+ARG LIBNICE_SHA256=8bacba53e59ec6d72e9a398835c4df6446d5e0d71b2dabb7a19f6d6c5a72dcbe
+ADD https://gitlab.com/libnice/libnice/-/archive/${LIBNICE_VERSION}/libnice-${LIBNICE_VERSION}.tar.gz /tmp/libnice.tar.gz
 
 ARG LIBSRTP_VERSION=2.3.0
 ARG LIBSRTP_SHA256=94093a5d04c5f4743e8d81182b76938374df6d393b45322f24960d250b0110e8
-ARG LIBSRTP_URL=https://github.com/cisco/libsrtp/archive/refs/tags/v${LIBSRTP_VERSION}.tar.gz
+ADD https://github.com/cisco/libsrtp/archive/refs/tags/v${LIBSRTP_VERSION}.tar.gz /tmp/libsrtp.tar.gz
 
 ARG USRSCTP_VERSION=0.9.5.0
 ARG USRSCTP_SHA256=260107caf318650a57a8caa593550e39bca6943e93f970c80d6c17e59d62cd92
-ARG USRSCTP_URL=https://github.com/sctplab/usrsctp/archive/refs/tags/${USRSCTP_VERSION}.tar.gz
+ADD https://github.com/sctplab/usrsctp/archive/refs/tags/${USRSCTP_VERSION}.tar.gz /tmp/usrsctp.tar.gz
 
 ARG LIBWEBSOCKETS_VERSION=4.2.0
 ARG LIBWEBSOCKETS_SHA256=a57e9a4765dbcd4d880feba8089b43ed69995eaf10d5d61a07981d9ddd975f40
-ARG LIBWEBSOCKETS_URL=https://github.com/warmcat/libwebsockets/archive/refs/tags/v${LIBWEBSOCKETS_VERSION}.tar.gz
+ADD https://github.com/warmcat/libwebsockets/archive/refs/tags/v${LIBWEBSOCKETS_VERSION}.tar.gz /tmp/libwebsockets.tar.gz
 
 ARG SOFIASIP_VERSION=1.12.11
 ARG SOFIASIP_SHA256=2b01bc2e1826e00d1f7f57d29a2854b15fd5fe24695e47a14a735d195dd37c81
-ARG SOFIASIP_URL=https://sourceforge.net/projects/sofia-sip/files/sofia-sip/${SOFIASIP_VERSION}/sofia-sip-${SOFIASIP_VERSION}.tar.gz/download
+ADD https://sourceforge.net/projects/sofia-sip/files/sofia-sip/${SOFIASIP_VERSION}/sofia-sip-${SOFIASIP_VERSION}.tar.gz/download /tmp/sofia-sip.tar.gz
 
-ADD patches/sofia-sip/*.patch /patches/sofia-sip/
+ADD patches/sofia-sip/*.patch /tmp/patches/sofia-sip/
 
 WORKDIR /build
 
@@ -39,7 +39,6 @@ RUN set -ex; \
         autoconf \
         automake \
         cmake \
-        curl \
         g++ \
         gcc \
         gengetopt \
@@ -48,10 +47,12 @@ RUN set -ex; \
         gtk-doc \
         file \
         libtool \
+        meson \
         make \
         patch \
         pkgconfig \
         rsync \
+        samurai \
         \
         curl-dev \
         ffmpeg-dev \
@@ -65,9 +66,8 @@ RUN set -ex; \
         openssl-dev \
         zlib-dev; \
     \
-    curl -fsSL -o boringssl.tar.gz $BORINGSSL_URL; \
-    echo "$BORINGSSL_SHA256 *boringssl.tar.gz" | sha256sum -c -; \
-    tar -xf boringssl.tar.gz --strip-components=1; \
+    echo "$BORINGSSL_SHA256 */tmp/boringssl.tar.gz" | sha256sum -c -; \
+    tar -xf /tmp/boringssl.tar.gz --strip-components=1; \
     sed -i s/" -Werror"//g CMakeLists.txt; \
     mkdir build; \
     cd build; \
@@ -79,31 +79,33 @@ RUN set -ex; \
     cp -R ../include /opt/boringssl; \
     cp ssl/libssl.a /opt/boringssl/lib; \
     cp crypto/libcrypto.a /opt/boringssl/lib; \
+    \
     cd /build; \
     rm -rf /build/*; \
     \
-    curl -fsSL -o libnice.tar.gz $LIBNICE_URL; \
-    echo "$LIBNICE_SHA256 *libnice.tar.gz" | sha256sum -c -; \
-    tar -xf libnice.tar.gz --strip-components=1; \
-    ./autogen.sh \
-        --disable-gtk-doc-html \
-        --with-crypto-library=openssl; \
-    make; \
-    make install; \
+    echo "$LIBNICE_SHA256 */tmp/libnice.tar.gz" | sha256sum -c -; \
+    tar -xf /tmp/libnice.tar.gz --strip-components=1; \
+    meson build; \
+    meson configure build \
+        -Dcrypto-library=openssl \
+        -Dexamples=disabled \
+        -Dgtk_doc=disabled; \
+    ninja -C build; \
+    ninja -C build install; \
+    \
     rm -rf /build/*; \
     \
-    curl -fsSL -o libsrtp.tar.gz $LIBSRTP_URL; \
-    echo "$LIBSRTP_SHA256 *libsrtp.tar.gz" | sha256sum -c -; \
-    tar -xf libsrtp.tar.gz --strip-components=1; \
+    echo "$LIBSRTP_SHA256 */tmp/libsrtp.tar.gz" | sha256sum -c -; \
+    tar -xf /tmp/libsrtp.tar.gz --strip-components=1; \
     ./configure \
         --enable-openssl; \
     make shared_library; \
     make install; \
+    \
     rm -rf /build/*; \
     \
-    curl -fsSL -o usrsctp.tar.gz $USRSCTP_URL; \
-    echo "$USRSCTP_SHA256 *usrsctp.tar.gz" | sha256sum -c -; \
-    tar -xf usrsctp.tar.gz --strip-components=1; \
+    echo "$USRSCTP_SHA256 */tmp/usrsctp.tar.gz" | sha256sum -c -; \
+    tar -xf /tmp/usrsctp.tar.gz --strip-components=1; \
     ./bootstrap; \
     ./configure \
         --disable-programs \
@@ -111,11 +113,11 @@ RUN set -ex; \
         --disable-inet6; \
     make; \
     make install; \
+    \
     rm -rf /build/*; \
     \
-    curl -fsSL -o libwebsockets.tar.gz $LIBWEBSOCKETS_URL; \
-    echo "$LIBWEBSOCKETS_SHA256 *libwebsockets.tar.gz" | sha256sum -c -; \
-    tar -xf libwebsockets.tar.gz --strip-components=1; \
+    echo "$LIBWEBSOCKETS_SHA256 */tmp/libwebsockets.tar.gz" | sha256sum -c -; \
+    tar -xf /tmp/libwebsockets.tar.gz --strip-components=1; \
     mkdir build; \
     cd build; \
     cmake \
@@ -128,24 +130,24 @@ RUN set -ex; \
         ..; \
     make; \
     make install; \
+    \
     cd /build; \
     rm -rf /build/*; \
     \
-    curl -fsSL -o sofia-sip.tar.gz $SOFIASIP_URL; \
-    echo "$SOFIASIP_SHA256 *sofia-sip.tar.gz" | sha256sum -c -; \
-    tar xf sofia-sip.tar.gz --strip-components=1; \
-    cat /patches/sofia-sip/*.patch | patch -p1; \
+    echo "$SOFIASIP_SHA256 */tmp/sofia-sip.tar.gz" | sha256sum -c -; \
+    tar xf /tmp/sofia-sip.tar.gz --strip-components=1; \
+    cat /tmp/patches/sofia-sip/*.patch | patch -p1; \
     ./configure; \
     make; \
     make install; \
+    \
     rm -rf /build/*; \
     \
-    curl -fsSL -o janus.tar.gz $URL; \
-    echo "$SHA256 *janus.tar.gz" | sha256sum -c -; \
-    tar -xf janus.tar.gz --strip-components=1; \
+    echo "$SHA256 */tmp/janus-gateway.tar.gz" | sha256sum -c -; \
+    tar -xf /tmp/janus-gateway.tar.gz --strip-components=1; \
     sh autogen.sh; \
     ./configure \
-        --prefix=/opt/janus \
+        --prefix=/usr/local/janus \
         --disable-all-handlers \
         --disable-all-plugins \
         --disable-all-transports \
@@ -161,14 +163,12 @@ RUN set -ex; \
     make; \
     make install; \
     make configs; \
-    rm -rf /build/*; \
     \
-    ln -s /opt/janus/bin/janus /usr/local/bin/janus; \
-    mkdir -p /opt/janus/lib/janus/loggers; \
-    mv /opt/janus/etc/janus /etc/; \
+    mkdir -p /usr/local/janus/lib/janus/loggers; \
+    mv /usr/local/janus/etc/janus /etc/; \
     \
     runDeps="$( \
-        scanelf --needed --nobanner --format '%n#p' --recursive /opt/janus \
+        scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/janus \
             | tr ',' '\n' \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
@@ -178,8 +178,7 @@ RUN set -ex; \
     \
     rm -rf \
         /build \
-        /patches \
-        /opt/janus/etc \
+        /usr/local/janus/etc \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*
@@ -188,5 +187,5 @@ WORKDIR /
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["/usr/local/bin/janus", "--configs-folder=/etc/janus"]
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["/usr/local/janus/bin/janus", "--configs-folder=/etc/janus"]
