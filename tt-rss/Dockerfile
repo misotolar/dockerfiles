@@ -2,8 +2,8 @@ FROM php:8.0-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=ea4bbd7a46572b54a7bd07153690a7965719c1a7
-ARG SHA256=8af1b33b8f8a2dca4e3408654fd6566a9f3fe593d1a598b96f0c9b3987e52d4a
+ARG VERSION=2654b3c6be408113ede52180ae283afa72da5f3c
+ARG SHA256=2e266d66f182d213509ec079454522b23f23da3e411de4b1f037793e97284db8
 ADD https://git-gitea.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
 ARG TTRSS_NGINX_ACCEL_VERSION=e7d3a2855c5f4d97bc7ab53a415e35dfd35745fe
