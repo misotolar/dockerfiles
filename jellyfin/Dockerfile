@@ -4,8 +4,8 @@ ARG MEDIASDK_VERSION=22.3.0
 ARG MEDIASDK_SHA256=e1e74229f409e969b70c2b35b1955068de3d40db85ecc42bd6ff501468bc76d7
 ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
 
-ARG FFMPEG_VERSION=4.4.1
-ARG FFMPEG_SHA256=8fc9f20ac5ed95115a9e285647add0eedd5cc1a98a039ada14c132452f98ac42
+ARG FFMPEG_VERSION=5.0.1
+ARG FFMPEG_SHA256=28df33d400a1c1c1b20d07a99197809a3b88ef765f5f07dc1ff067fac64c59d6
 ADD https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 /tmp/ffmpeg.tar.bz2
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
