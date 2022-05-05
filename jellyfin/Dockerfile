@@ -8,6 +8,10 @@ ARG FFMPEG_VERSION=5.0.1
 ARG FFMPEG_SHA256=28df33d400a1c1c1b20d07a99197809a3b88ef765f5f07dc1ff067fac64c59d6
 ADD https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 /tmp/ffmpeg.tar.bz2
 
+ARG JELLYFIN_FFMPEG_VERSION=$FFMPEG_VERSION-2
+ARG JELLYFIN_FFMPEG_SHA256=3fb3fa8be874a567146816729f3d7d989118059507fa56cf76bf732ee2043587
+ADD https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v$JELLYFIN_FFMPEG_VERSION.tar.gz /tmp/jellyfin-ffmpeg.tar.gz
+
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
 ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
 ARG SRC=/usr/local
@@ -86,14 +90,18 @@ RUN set -ex; \
 ENV CFLAGS="-O2 -pipe -march=x86-64 -mtune=generic"
 ENV CXXFLAGS="-O2 -pipe -march=x86-64 -mtune=generic"
 
-WORKDIR /tmp/ffmpeg
+WORKDIR /tmp/jellyfin-ffmpeg
 
-ADD patches/jellyfin-ffmpeg/*.patch /tmp/ffmpeg/patches/
+RUN set -ex; \
+    echo "$JELLYFIN_FFMPEG_SHA256 ../jellyfin-ffmpeg.tar.gz" | sha256sum --status -c -; \
+    tar xf ../jellyfin-ffmpeg.tar.gz --strip-components=1
+
+WORKDIR /tmp/ffmpeg
 
 RUN set -ex; \
     echo "$FFMPEG_SHA256  ../ffmpeg.tar.bz2" | sha256sum --status -c -; \
     tar xf ../ffmpeg.tar.bz2 --strip-components=1; \
-    cat patches/*.patch | patch -p1; \
+    cat ../jellyfin-ffmpeg/debian/patches/*.patch | patch -p1; \
     ./configure \
         --disable-doc \
         --disable-debug \
