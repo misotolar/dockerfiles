@@ -2,8 +2,8 @@ FROM php:8.0-fpm-alpine3.15
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=5.1.3
-ARG SHA256=c562feddc0f8ff5e69629113f273a0d024a65fb928c48e89ce614744d478296f
+ARG VERSION=5.2.0
+ARG SHA256=66da31ca295f06182ac3f2e6e96057dc824c459baedf4b29de6ed0d3be039230
 ADD https://files.phpmyadmin.net/phpMyAdmin/${VERSION}/phpMyAdmin-${VERSION}-all-languages.tar.xz /usr/src/phpMyAdmin.tar.xz
 
 ENV PHP_MAX_EXECUTION_TIME 600
@@ -13,6 +13,9 @@ ENV PHP_UPLOAD_LIMIT 2048K
 WORKDIR /usr/local/phpmyadmin
 
 RUN set -ex; \
+    apk add --no-cache \
+        rsync \
+    ; \
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         bzip2-dev \
