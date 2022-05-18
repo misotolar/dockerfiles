@@ -8,8 +8,8 @@ ARG FFMPEG_VERSION=5.0.1
 ARG FFMPEG_SHA256=28df33d400a1c1c1b20d07a99197809a3b88ef765f5f07dc1ff067fac64c59d6
 ADD https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 /tmp/ffmpeg.tar.bz2
 
-ARG JELLYFIN_FFMPEG_VERSION=$FFMPEG_VERSION-3
-ARG JELLYFIN_FFMPEG_SHA256=9d51093d4698d24a35012014f712254cf811b6c1931fc6fa0dfd648f3131e039
+ARG JELLYFIN_FFMPEG_VERSION=$FFMPEG_VERSION-4
+ARG JELLYFIN_FFMPEG_SHA256=19d7e9f5d6048e09c7725839756cee9da1c9339aba12a12d645342f9c2d8be42
 ADD https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v$JELLYFIN_FFMPEG_VERSION.tar.gz /tmp/jellyfin-ffmpeg.tar.gz
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
