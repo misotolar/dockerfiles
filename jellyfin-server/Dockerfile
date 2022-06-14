@@ -1,44 +1,40 @@
-ARG DOTNET_VERSION=5.0
-ARG ALPINE_VERSION=3.14
+FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
 
-FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}-alpine AS build
-
-ARG VERSION=10.7.7
-ARG URL=https://github.com/jellyfin/jellyfin
+ARG VERSION=10.8.0
+ARG URL=https://github.com/jellyfin/jellyfin.git
 
 ARG DOTNET_CLI_TELEMETRY_OPTOUT=1
 
-WORKDIR /build
-
-ADD patches/jellyfin/*.patch /tmp/patches/
+WORKDIR /tmp/jellyfin
 
 RUN set -ex; \
     apk add --no-cache --virtual .build-deps \
         git \
-        patch; \
-    git clone --branch v$VERSION --depth=1 -c advice.detachedHead=false $URL /build; \
-    cat /tmp/patches/*.patch | patch -p1; \
+    ; \
+    git clone --branch v$VERSION --depth=1 -c advice.detachedHead=false $URL /tmp/jellyfin; \
     dotnet publish \
+        Jellyfin.Server \
         --configuration Release \
-        --output=/build/dist \
         --self-contained \
         --runtime alpine-x64 \
-        "-p:GenerateDocumentationFile=false;DebugSymbols=false;DebugType=none" \
-        Jellyfin.Server; \
+        --disable-parallel \
+        --output=/tmp/jellyfin/dist \
+        "-p:DebugSymbols=false;DebugType=none" \
+    ; \
     apk del --no-network .build-deps; \
-    mv /build/dist /dist; \
+    mv /tmp/jellyfin/dist /dist; \
     rm -rf \
-        /build \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*;
 
-FROM node:current-alpine AS build_web
+FROM node:lts-alpine AS build_web
 
-ARG VERSION=10.7.7
-ARG URL=https://github.com/jellyfin/jellyfin-web
+ARG VERSION=10.8.0
+ARG SHA256=db913b7f8d355e330f7e649bda68ef849ca9e9184696601c72696b6c03e72a3b
+ADD https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v$VERSION.tar.gz /tmp/jellyfin-web.tar.gz
 
-WORKDIR /build
+WORKDIR /tmp/jellyfin-web
 
 RUN set -ex; \
     apk add --no-cache --virtual .build-deps \
@@ -48,26 +44,27 @@ RUN set -ex; \
         curl \
         g++ \
         gcc \
-        gifsicle \
         git \
         libtool \
+        libpng-dev \
         make \
         musl-dev \
         nasm \
-        python2 \
+        python3 \
         zlib \
-        zlib-dev; \
-    git clone --branch v$VERSION --depth=1 -c advice.detachedHead=false $URL /build; \
-    yarn install; \
+        zlib-dev \
+    ; \
+    echo "$SHA256  ../jellyfin-web.tar.gz" | sha256sum -c -; \
+    tar xf ../jellyfin-web.tar.gz --strip-components=1; \
+    npm ci --no-audit --unsafe-perm; \
     apk del --no-network .build-deps; \
-    mv /build/dist /dist; \
+    mv /tmp/jellyfin-web/dist /dist; \
     rm -rf \
-        /build \
         /var/cache/apk/* \
         /var/tmp/* \
         /tmp/*;
 
-FROM alpine:${ALPINE_VERSION}
+FROM alpine:3.16
 
 LABEL mantainer="michal@sotolar.com"
 
@@ -86,7 +83,8 @@ RUN set -ex; \
         icu-libs \
         libssl1.1 \
         libstdc++ \
-        libintl; \
+        libintl \
+    ; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
