@@ -4,13 +4,9 @@ ARG MEDIASDK_VERSION=22.4.3
 ARG MEDIASDK_SHA256=edaba06c0d190d8029ae1eed039f3c6c4cdc60ced3fe2e88788659294c31c23c
 ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
 
-ARG FFMPEG_VERSION=5.0.1
-ARG FFMPEG_SHA256=28df33d400a1c1c1b20d07a99197809a3b88ef765f5f07dc1ff067fac64c59d6
-ADD https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 /tmp/ffmpeg.tar.bz2
-
-ARG JELLYFIN_FFMPEG_VERSION=$FFMPEG_VERSION-5
-ARG JELLYFIN_FFMPEG_SHA256=b41239df414ff83d2c05021411dbf8272904b829cdf1c597cc8f10427c2b0c4d
-ADD https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v$JELLYFIN_FFMPEG_VERSION.tar.gz /tmp/jellyfin-ffmpeg.tar.gz
+ARG FFMPEG_VERSION=5.0.1-6
+ARG FFMPEG_SHA256=1949594f0d10da98dbf5ff5ab12b1069ad5b3b58d2d3aa354496c31a0ba14bbf
+ADD https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v$FFMPEG_VERSION.tar.gz /tmp/ffmpeg.tar.gz
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
 ARG PKG_CONFIG_PATH=/opt/intel/mediasdk/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/lib/pkgconfig
@@ -87,18 +83,12 @@ RUN set -ex; \
 ENV CFLAGS="-O2 -pipe -march=x86-64 -mtune=generic"
 ENV CXXFLAGS="-O2 -pipe -march=x86-64 -mtune=generic"
 
-WORKDIR /tmp/jellyfin-ffmpeg
-
-RUN set -ex; \
-    echo "$JELLYFIN_FFMPEG_SHA256 ../jellyfin-ffmpeg.tar.gz" | sha256sum --status -c -; \
-    tar xf ../jellyfin-ffmpeg.tar.gz --strip-components=1
-
 WORKDIR /tmp/ffmpeg
 
 RUN set -ex; \
-    echo "$FFMPEG_SHA256  ../ffmpeg.tar.bz2" | sha256sum --status -c -; \
-    tar xf ../ffmpeg.tar.bz2 --strip-components=1; \
-    cat ../jellyfin-ffmpeg/debian/patches/*.patch | patch -p1; \
+    echo "$FFMPEG_SHA256  ../ffmpeg.tar.gz" | sha256sum --status -c -; \
+    tar xf ../ffmpeg.tar.gz --strip-components=1; \
+    cat debian/patches/*.patch | patch -p1; \
     ./configure \
         --disable-doc \
         --disable-debug \
