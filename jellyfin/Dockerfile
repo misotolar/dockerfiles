@@ -1,7 +1,7 @@
-FROM alpine:3.14 as build
+FROM alpine:3.16 as build
 
-ARG MEDIASDK_VERSION=22.3.0
-ARG MEDIASDK_SHA256=e1e74229f409e969b70c2b35b1955068de3d40db85ecc42bd6ff501468bc76d7
+ARG MEDIASDK_VERSION=22.4.3
+ARG MEDIASDK_SHA256=edaba06c0d190d8029ae1eed039f3c6c4cdc60ced3fe2e88788659294c31c23c
 ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
 
 ARG FFMPEG_VERSION=5.0.1
@@ -18,17 +18,21 @@ ARG SRC=/usr/local
 ARG PREFIX=/usr/local
 
 RUN set -ex; \
-    apk add --no-cache \
+    apk add --no-cache --upgrade \
         autoconf \
         automake \
         alpine-sdk \
+        bash \
         ca-certificates \
         cmake \
         coreutils \
         cunit-dev \
         curl \
         dos2unix \
+        g++ \
+        gcc \
         libtool \
+        musl \
         nasm \
         python3 \
         tzdata \
@@ -38,6 +42,8 @@ RUN set -ex; \
         cunit-dev \
         dav1d-dev \
         fdk-aac-dev \
+        ffmpeg-libs \
+        ffmpeg-dev \
         fontconfig-dev \
         freetype-dev \
         fribidi-dev \
@@ -58,18 +64,9 @@ RUN set -ex; \
         x264-dev \
         x265-dev \
         \
-        libva-intel-driver; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
-    apk add --no-cache --upgrade \
-        gcc \
-        g++ \
-        ffmpeg-libs \
-        ffmpeg-dev \
-        libva-dev \
         intel-media-driver-dev \
-        musl;
+        libva-dev \
+        libva-intel-driver;
 
 WORKDIR /tmp/mediasdk
 
@@ -145,15 +142,17 @@ RUN set -ex; \
     cp tools/qt-faststart /build$PREFIX/bin
 
 WORKDIR /tmp/build
+
 COPY utilities/extractlibrary /tmp/build/extractlibrary
 
 RUN set -ex; \
     echo /usr/local/bin/ffmpeg >> cplist; \
     echo /usr/local/bin/ffprobe >> cplist; \
-    ./extractlibrary cplist /build; \
-    cp --archive --parents --no-dereference /opt/intel /build
+    /tmp/build/extractlibrary cplist /build; \
+    cp --archive --parents --no-dereference /opt/intel /build; \
+    rm -rf extractlibrary cplist
 
-FROM misotolar/jellyfin-server:d330ba81
+FROM misotolar/jellyfin-server:d3644220
 
 LABEL mantainer="michal@sotolar.com"
 
@@ -161,11 +160,9 @@ ENV LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
 
 RUN set -ex; \
     apk add --no-cache --upgrade \
-        libva-intel-driver; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories; \
-    echo http://dl-2.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories; \
-    apk add --no-cache --upgrade \
-        intel-media-driver; \
+        libva-intel-driver \
+        intel-media-driver \
+    ; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
