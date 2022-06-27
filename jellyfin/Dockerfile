@@ -4,8 +4,8 @@ ARG MEDIASDK_VERSION=22.4.3
 ARG MEDIASDK_SHA256=edaba06c0d190d8029ae1eed039f3c6c4cdc60ced3fe2e88788659294c31c23c
 ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
 
-ARG FFMPEG_VERSION=5.0.1-6
-ARG FFMPEG_SHA256=1949594f0d10da98dbf5ff5ab12b1069ad5b3b58d2d3aa354496c31a0ba14bbf
+ARG FFMPEG_VERSION=5.0.1-7
+ARG FFMPEG_SHA256=8d1c87122368e410c534a472e77ea83abca493caa0a5211dd9ebf47aac0999e2
 ADD https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v$FFMPEG_VERSION.tar.gz /tmp/ffmpeg.tar.gz
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
@@ -142,7 +142,7 @@ RUN set -ex; \
     cp --archive --parents --no-dereference /opt/intel /build; \
     rm -rf extractlibrary cplist
 
-FROM misotolar/jellyfin-server:d3644220
+FROM misotolar/jellyfin-server:cd890597
 
 LABEL mantainer="michal@sotolar.com"
 
