@@ -2,8 +2,8 @@ ARG NODE_VERSION=lts
 
 FROM node:$NODE_VERSION-alpine
 
-ARG VERSION=107d5d5b11fac6198e5196d10b725e2afc92fcd5
-ARG SHA256=d5d921a333bad1e32ac544414e15fe4c190a92605e9dc674d3cddaffeba8c1f7
+ARG VERSION=601b151db3bc91e8ffcc9b07242e0ef445ead64f
+ARG SHA256=3fef04354f4f31fe8b553f28c8ad02074d5bc740c0885d4d6f9fa1de9b4025dd
 ADD https://github.com/misotolar/Node-Media-Server/archive/${VERSION}.tar.gz /tmp/node-media-server.tar.gz
 
 ENV APP_RTMP_PORT 1935
