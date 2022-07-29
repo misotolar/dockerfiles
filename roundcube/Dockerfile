@@ -1,9 +1,9 @@
-FROM php:7.4-fpm-alpine3.15
+FROM php:8.0-fpm-alpine3.16
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.5.3
-ARG SHA256=4bcfac219f2e0005c912dac3227743cc1ed0ded69c822f74c81a70d041e5a3bd
+ARG VERSION=1.6.0
+ARG SHA256=2409ccdfe2e465f086cb9fc18c88dfe0aaf6ccc23924564975061209921694ba
 ADD https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz /usr/src/roundcubemail.tar.gz
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
