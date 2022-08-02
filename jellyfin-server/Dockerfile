@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS build
 
-ARG VERSION=10.8.1
+ARG VERSION=10.8.3
 ARG URL=https://github.com/jellyfin/jellyfin.git
 
 ARG DOTNET_CLI_TELEMETRY_OPTOUT=1
@@ -30,8 +30,8 @@ RUN set -ex; \
 
 FROM node:lts-alpine AS build_web
 
-ARG VERSION=10.8.1
-ARG SHA256=66304b68c7360718d614cb650d580cfd7026e37734ff2f2ec27d185cb0c8358b
+ARG VERSION=10.8.3
+ARG SHA256=a2496c7782eab50f846976acfec8f75068265e27126dfe19adb0ec29fca74770
 ADD https://github.com/jellyfin/jellyfin-web/archive/refs/tags/v$VERSION.tar.gz /tmp/jellyfin-web.tar.gz
 
 WORKDIR /tmp/jellyfin-web
