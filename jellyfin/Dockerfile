@@ -4,8 +4,8 @@ ARG MEDIASDK_VERSION=22.4.3
 ARG MEDIASDK_SHA256=edaba06c0d190d8029ae1eed039f3c6c4cdc60ced3fe2e88788659294c31c23c
 ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
 
-ARG FFMPEG_VERSION=5.1-1
-ARG FFMPEG_SHA256=88f8d7e44f3533e05bf496bfdf661107b2d794e7b83815ca27b26c9fe2f110cd
+ARG FFMPEG_VERSION=5.1-2
+ARG FFMPEG_SHA256=5edc38880eb011d1b432b552573e9efbbae554a20f4b5d4dcecd5fe90254c0cd
 ADD https://github.com/jellyfin/jellyfin-ffmpeg/archive/refs/tags/v$FFMPEG_VERSION.tar.gz /tmp/ffmpeg.tar.gz
 
 ARG LD_LIBRARY_PATH=/opt/intel/mediasdk/lib:/usr/local/lib:/usr/lib:/lib
