@@ -2,15 +2,21 @@
 
 locale-gen
 
+if [ -n "$USER_DIALOUT_GID" ]; then
+    if [ "$USER_DIALOUT_GID" != $(getent group dialout | cut -d: -f3) ]; then
+        groupmod -g "$USER_DIALOUT_GID" dialout
+    fi
+fi
+
 if [ -n "$USER_DISK_GID" ]; then
     if [ "$USER_DISK_GID" != $(getent group disk | cut -d: -f3) ]; then
         groupmod -g "$USER_DISK_GID" disk
     fi
 fi
 
-if [ -n "$USER_DIALOUT_GID" ]; then
-    if [ "$USER_DIALOUT_GID" != $(getent group dialout | cut -d: -f3) ]; then
-        groupmod -g "$USER_DIALOUT_GID" dialout
+if [ -n "$USER_LP_GID" ]; then
+    if [ "$USER_LP_GID" != $(getent group lp | cut -d: -f3) ]; then
+        groupmod -g "$USER_LP_GID" lp
     fi
 fi
 
@@ -24,7 +30,7 @@ if ! id -u "$PHP_USER" > /dev/null 2>&1; then
     adduser --quiet --disabled-password --uid "$PHP_USER_UID" --shell /bin/bash --home /home/"$PHP_USER" --gecos "$PHP_USER_GECOS" "$PHP_USER"
     echo "$PHP_USER ALL=(ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/"$PHP_USER"
     touch /home/"$PHP_USER"/.sudo_as_admin_successful
-    usermod -aG dialout,disk,video,sudo "$PHP_USER"
+    usermod -aG dialout,disk,lp,video,sudo "$PHP_USER"
     chown $PHP_USER:$PHP_USER /home/$PHP_USER
 fi
 
