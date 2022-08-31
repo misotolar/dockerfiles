@@ -8,10 +8,10 @@ ENV PHP_USER_GECOS Ubuntu Bionic
 ENV PHP_FPM_LISTEN 0.0.0.0:9000
 
 ENV PHP_VERSION 7.3
-ENV PHP_PACKAGE_VERSION 7.3.33-1
+ENV PHP_PACKAGE_VERSION 7.3.33-5
 
-ENV PHP_DIO_VERSION 0.2.0
-ENV PHP_EVENT_VERSION 3.0.6
+ENV PHP_DIO_VERSION 0.2.1
+ENV PHP_EVENT_VERSION 3.0.8
 ENV PHP_SQLSRV_VERSION 5.9.0
 
 ARG ACCEPT_EULA=Y
@@ -93,6 +93,7 @@ RUN set -ex; \
         tzdata \
         sassc \
         sudo \
+        v4l-utils \
         xfce4-terminal \
         xprintidle; \
     ln -fs /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm; \
