@@ -29,10 +29,15 @@ cd /tmp/build
 
 sudo pacman -Syu --noconfirm
 
-source PKGBUILD
-if [[ ${#validpgpkeys[@]} > 0 ]]; then
-    echo '==> Fetching PGP keys...'
-    gpg --recv-keys ${validpgpkeys[@]}
+if [[ -d /tmp/build/keys/pgp ]]; then
+    echo '==> Importing PGP keys...'
+    gpg --import /tmp/build/keys/pgp/*.asc
+else
+    source PKGBUILD
+    if [[ ${#validpgpkeys[@]} > 0 ]]; then
+        echo '==> Fetching PGP keys...'
+        gpg --recv-keys ${validpgpkeys[@]}
+    fi
 fi
 
 paru -U --noconfirm
