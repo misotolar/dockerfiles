@@ -88,6 +88,7 @@ RUN set -ex; \
         php${PHP_VERSION}-phalcon3 \
         php${PHP_VERSION}-smbclient \
         php${PHP_VERSION}-sqlite3 \
+        php${PHP_VERSION}-tidy \
         php${PHP_VERSION}-zip \
         php${PHP_VERSION}-xml \
         tzdata \
