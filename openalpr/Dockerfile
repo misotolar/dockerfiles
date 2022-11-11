@@ -21,6 +21,9 @@ ADD https://github.com/tesseract-ocr/tesseract/archive/$TESSERACT_VERSION.tar.gz
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
+ENV BEANSTALKD_LISTEN_ADDR 127.0.0.1
+ENV BEANSTALKD_LISTEN_PORT 11300
+
 RUN set -ex; \
     echo "deb http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse" | tee /etc/apt/sources.list; \
     echo "deb http://archive.ubuntu.com/ubuntu focal-security main restricted universe multiverse" >> /etc/apt/sources.list; \
@@ -31,6 +34,7 @@ RUN set -ex; \
         autoconf \
         automake \
         autotools-dev \
+        beanstalkd \
         build-essential \
         ca-certificates \
         cmake \
@@ -126,6 +130,7 @@ RUN set -ex; \
 # https://github.com/openalpr/openalpr/pull/869
 # https://github.com/openalpr/openalpr/pull/966
 COPY runtime/eu.patterns /usr/share/openalpr/runtime_data/postprocess/eu.patterns
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 STOPSIGNAL SIGKILL
-CMD ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["entrypoint.sh"]
