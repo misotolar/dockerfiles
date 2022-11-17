@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:bionic
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -25,9 +25,9 @@ ENV BEANSTALKD_LISTEN_ADDR 127.0.0.1
 ENV BEANSTALKD_LISTEN_PORT 11300
 
 RUN set -ex; \
-    echo "deb http://archive.ubuntu.com/ubuntu focal main restricted universe multiverse" | tee /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu focal-security main restricted universe multiverse" >> /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu focal-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
@@ -40,13 +40,20 @@ RUN set -ex; \
         cmake \
         curl \
         git \
+        libavcodec57 \
+        libavcodec-dev \
+        libavformat57 \
+        libavformat-dev \
+        libavresample3 \
+        libavresample-dev \
         libcurl4 \
         libcurl4-openssl-dev \
-        libjpeg-turbo8 \
         libjpeg8 \
         libjpeg8-dev \
         liblog4cplus-1.1-9 \
         liblog4cplus-dev \
+        libswscale4 \
+        libswscale-dev \
         libtool \
         pkg-config \
         tzdata; \
@@ -56,6 +63,7 @@ RUN set -ex; \
     mkdir -p /tmp/opencv/release; \
     cd /tmp/opencv/release; \
     cmake \
+        -DCMAKE_BUILD_TYPE=RELEASE \
         -DBUILD_EXAMPLES=OFF \
         -DBUILD_opencv_apps=OFF \
         -DBUILD_DOCS=OFF \
@@ -111,9 +119,13 @@ RUN set -ex; \
         curl \
         dpkg-dev \
         git \
+        libavcodec-dev \
+        libavformat-dev \
+        libavresample-dev \
         libcurl4-openssl-dev \
         libjpeg8-dev \
         liblog4cplus-dev \
+        libswscale-dev \
         libtool \
         pkg-config; \
     apt-get autoremove --purge -y; \
