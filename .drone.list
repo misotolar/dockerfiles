@@ -25,3 +25,4 @@ shorewall/.drone.yml
 tt-rss/.drone.yml
 unoconv/.drone.yml
 unoserver/.drone.yml
+xtables-addons/.drone.yml

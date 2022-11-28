@@ -1,0 +1,6 @@
+services:
+    shorewall:
+        build: .
+        container_name: xtables-addons
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
