@@ -1,14 +1,14 @@
-FROM php:8.0-fpm-alpine3.15
+FROM php:8.1-fpm-alpine3.16
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=d47b8c8494ed41c8a72c21b238dde74e606c5f0e
-ARG SHA256=d064253636c48d6116a55fab379b3ec575fb0b095a621eb1b78fe7a598ab0f63
-ADD https://git-gitea.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
+ARG VERSION=292ca86665d13582028d32d6d40bbb6f4d8f5cc1
+ARG SHA256=e1827c508fd9b86a588cbd52f9f7819905cc01c3fb04217d6aa5a104e3efd35f
+ADD https://dev.tt-rss.org/fox/tt-rss/archive/$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
-ARG TTRSS_NGINX_ACCEL_VERSION=e7d3a2855c5f4d97bc7ab53a415e35dfd35745fe
-ARG TTRSS_NGINX_ACCEL_SHA256=18baf5643407786817b09016658d9ef1cafd7d95805da120c6efc25b4b61abe1
-ADD https://git-gitea.tt-rss.org/fox/ttrss-nginx-xaccel/archive/$TTRSS_NGINX_ACCEL_VERSION.tar.gz /usr/src/ttrss-nginx-xaccel.tar.gz
+ARG TTRSS_NGINX_ACCEL_VERSION=fa76dda65d080b46928a70d1f02cfda35e981056
+ARG TTRSS_NGINX_ACCEL_SHA256=0ef2d038e21f108696165d6ba124a5e64f4b22d6418d867515388641c2d2a74c
+ADD https://dev.tt-rss.org/fox/ttrss-nginx-xaccel/archive/$TTRSS_NGINX_ACCEL_VERSION.tar.gz /usr/src/ttrss-nginx-xaccel.tar.gz
 
 ENV PHP_MAX_EXECUTION_TIME 300
 ENV PHP_MEMORY_LIMIT 64M
