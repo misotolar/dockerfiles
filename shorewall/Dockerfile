@@ -2,6 +2,7 @@ FROM debian:bullseye-slim AS build
 
 ARG MAJOR=5.2
 ARG VERSION=$MAJOR.8
+ARG RELEASE=2
 ARG DEBIAN_VERSION=5.2.3.4-1
 
 ARG SHOREWALL_URL=https://shorewall.org/pub/shorewall/$MAJOR/shorewall-$VERSION/shorewall-$VERSION.tgz
@@ -30,6 +31,7 @@ ARG SHOREWALL6_LITE_DEBIAN_URL=http://deb.debian.org/debian/pool/main/s/shorewal
 ARG SHOREWALL6_LITE_DEBIAN_SHA256=8d5150ef8c209d6523f146ca5cf8a90c81c45de3f626837049f9b36ab639ccc9
 
 ARG DEBFULLNAME="Michal Sotolar"
+ARG DEBEMAIL="michal@sotolar.com"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
@@ -77,35 +79,35 @@ RUN set -ex; \
     mkdir /build/shorewall; cd /build/shorewall; \
     tar xf /tmp/shorewall.tgz --strip-components=1; \
     tar xf /tmp/shorewall-debian.tar.xz; \
-    dch -v $VERSION-1+misotolar "Backport {$VERSION} release"; \
+    dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b; \
     mkdir /build/shorewall-core; cd /build/shorewall-core; \
     tar xf /tmp/shorewall-core.tgz --strip-components=1; \
     tar xf /tmp/shorewall-core-debian.tar.xz; \
-    dch -v $VERSION-1+misotolar "Backport {$VERSION} release"; \
+    dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b; \
     mkdir /build/shorewall-init; cd /build/shorewall-init; \
     tar xf /tmp/shorewall-init.tgz --strip-components=1; \
     tar xf /tmp/shorewall-init-debian.tar.xz; \
-    dch -v $VERSION-1+misotolar "Backport {$VERSION} release"; \
+    dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b; \
     mkdir /build/shorewall-lite; cd /build/shorewall-lite; \
     tar xf /tmp/shorewall-lite.tgz --strip-components=1; \
     tar xf /tmp/shorewall-lite-debian.tar.xz; \
-    dch -v $VERSION-1+misotolar "Backport {$VERSION} release"; \
+    dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b; \
     mkdir /build/shorewall6; cd /build/shorewall6; \
     tar xf /tmp/shorewall6.tgz --strip-components=1; \
     tar xf /tmp/shorewall6-debian.tar.xz; \
-    dch -v $VERSION-1+misotolar "Backport {$VERSION} release"; \
+    dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b; \
     mkdir /build/shorewall6-lite; cd /build/shorewall6-lite; \
     tar xf /tmp/shorewall6-lite.tgz --strip-components=1; \
     tar xf /tmp/shorewall6-lite-debian.tar.xz; \
-    dch -v $VERSION-1+misotolar "Backport {$VERSION} release"; \
+    dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b
 
-FROM alpine:3.14
+FROM alpine:3.17
 
 LABEL maintainer="michal@sotolar.com"
 
