@@ -26,11 +26,9 @@ ARG LIBWEBSOCKETS_VERSION=4.3.2
 ARG LIBWEBSOCKETS_SHA256=6a85a1bccf25acc7e8e5383e4934c9b32a102880d1e4c37c70b27ae2a42406e1
 ADD https://github.com/warmcat/libwebsockets/archive/refs/tags/v${LIBWEBSOCKETS_VERSION}.tar.gz /tmp/libwebsockets.tar.gz
 
-ARG SOFIASIP_VERSION=1.12.11
-ARG SOFIASIP_SHA256=2b01bc2e1826e00d1f7f57d29a2854b15fd5fe24695e47a14a735d195dd37c81
-ADD https://sourceforge.net/projects/sofia-sip/files/sofia-sip/${SOFIASIP_VERSION}/sofia-sip-${SOFIASIP_VERSION}.tar.gz/download /tmp/sofia-sip.tar.gz
-
-ADD patches/sofia-sip/*.patch /tmp/patches/sofia-sip/
+ARG SOFIASIP_VERSION=1.13.9
+ARG SOFIASIP_SHA256=3e7bfe9345e7d196bb13cf2c6e758cec8d959f1b9dbbb3bd5459b004f6f65c6c
+ADD https://github.com/freeswitch/sofia-sip/archive/refs/tags/v${SOFIASIP_VERSION}.tar.gz /tmp/sofia-sip.tar.gz
 
 WORKDIR /build
 
@@ -136,7 +134,7 @@ RUN set -ex; \
     \
     echo "$SOFIASIP_SHA256 */tmp/sofia-sip.tar.gz" | sha256sum -c -; \
     tar xf /tmp/sofia-sip.tar.gz --strip-components=1; \
-    cat /tmp/patches/sofia-sip/*.patch | patch -p1; \
+    sh autogen.sh; \
     ./configure; \
     make; \
     make install; \
