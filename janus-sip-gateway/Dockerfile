@@ -10,8 +10,8 @@ ARG BORINGSSL_VERSION=chromium-stable
 ARG BORINGSSL_SHA256=e8cd8caba44d8630d4c221ce79a130d6e67e5a7d3e01135f6b45a6a9c72bb51f
 ADD https://github.com/google/boringssl/archive/refs/heads/${BORINGSSL_VERSION}.tar.gz /tmp/boringssl.tar.gz
 
-ARG LIBNICE_VERSION=0.1.18
-ARG LIBNICE_SHA256=8bacba53e59ec6d72e9a398835c4df6446d5e0d71b2dabb7a19f6d6c5a72dcbe
+ARG LIBNICE_VERSION=0.1.19
+ARG LIBNICE_SHA256=319502c8346f4295ad4c390fdf0bc2c810548b051005dcfa1f5c24b152daa318
 ADD https://gitlab.com/libnice/libnice/-/archive/${LIBNICE_VERSION}/libnice-${LIBNICE_VERSION}.tar.gz /tmp/libnice.tar.gz
 
 ARG LIBSRTP_VERSION=2.3.0
