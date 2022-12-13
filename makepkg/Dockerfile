@@ -1,4 +1,4 @@
-FROM archlinux:base-devel-20221204.0.107760
+FROM archlinux:base-devel-20221211.0.109768
 
 LABEL maintainer="michal@sotolar.com"
 
