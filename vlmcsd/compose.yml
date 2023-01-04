@@ -1,0 +1,6 @@
+services:
+    vlmcsd:
+        build: .
+        container_name: vlmcsd
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
