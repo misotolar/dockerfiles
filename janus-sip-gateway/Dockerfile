@@ -6,9 +6,9 @@ ARG VERSION=1.1.0
 ARG SHA256=a0d989c2e8ac9239ab172cf6be845a61099eb9421a78dfaf06f0dd7a38356d33
 ADD https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz /tmp/janus-gateway.tar.gz
 
-ARG BORINGSSL_VERSION=chromium-stable
-ARG BORINGSSL_SHA256=e8cd8caba44d8630d4c221ce79a130d6e67e5a7d3e01135f6b45a6a9c72bb51f
-ADD https://github.com/google/boringssl/archive/refs/heads/${BORINGSSL_VERSION}.tar.gz /tmp/boringssl.tar.gz
+ARG BORINGSSL_VERSION=1ccef4908ce04adc6d246262846f3cd8a111fa44
+ARG BORINGSSL_SHA256=59605601466b9f092dfd0779bbbf884ac5efd7807a2ebba89f19a9cc6a8443d3
+ADD https://github.com/google/boringssl/archive/${BORINGSSL_VERSION}.tar.gz /tmp/boringssl.tar.gz
 
 ARG LIBNICE_VERSION=0.1.19
 ARG LIBNICE_SHA256=319502c8346f4295ad4c390fdf0bc2c810548b051005dcfa1f5c24b152daa318
