@@ -10,9 +10,9 @@ ARG BORINGSSL_VERSION=1ccef4908ce04adc6d246262846f3cd8a111fa44
 ARG BORINGSSL_SHA256=59605601466b9f092dfd0779bbbf884ac5efd7807a2ebba89f19a9cc6a8443d3
 ADD https://github.com/google/boringssl/archive/${BORINGSSL_VERSION}.tar.gz /tmp/boringssl.tar.gz
 
-ARG LIBNICE_VERSION=0.1.19
-ARG LIBNICE_SHA256=319502c8346f4295ad4c390fdf0bc2c810548b051005dcfa1f5c24b152daa318
-ADD https://gitlab.com/libnice/libnice/-/archive/${LIBNICE_VERSION}/libnice-${LIBNICE_VERSION}.tar.gz /tmp/libnice.tar.gz
+ARG LIBNICE_VERSION=0.1.21
+ARG LIBNICE_SHA256=0f0d9a6b21cfb512593eacbba2a1981a3ba493341dd7377298085d47954b4ba4
+ADD https://gitlab.freedesktop.org/libnice/libnice/-/archive/${LIBNICE_VERSION}/libnice-${LIBNICE_VERSION}.tar.gz /tmp/libnice.tar.gz
 
 ARG LIBSRTP_VERSION=2.3.0
 ARG LIBSRTP_SHA256=94093a5d04c5f4743e8d81182b76938374df6d393b45322f24960d250b0110e8
