@@ -2,8 +2,8 @@ FROM alpine:3.17
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.1.1
-ARG SHA256=bb83c19d6137e39833e8eb2b1deeecb33b5d19d4f503d51703bdcc478c447940
+ARG VERSION=1.1.2
+ARG SHA256=f721d62a22b38ba3a341a5502f06b8b3a5a4f7bd0e9cc6c53de257fe99695e17
 ADD https://github.com/meetecho/janus-gateway/archive/refs/tags/v${VERSION}.tar.gz /tmp/janus-gateway.tar.gz
 
 ARG BORINGSSL_VERSION=1ccef4908ce04adc6d246262846f3cd8a111fa44
