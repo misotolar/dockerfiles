@@ -1,7 +1,9 @@
-FROM alpine:3.16 as build
+ARG ALPINE_VERSION=3.17
 
-ARG MEDIASDK_VERSION=22.4.3
-ARG MEDIASDK_SHA256=edaba06c0d190d8029ae1eed039f3c6c4cdc60ced3fe2e88788659294c31c23c
+FROM alpine:$ALPINE_VERSION as build
+
+ARG MEDIASDK_VERSION=22.6.3
+ARG MEDIASDK_SHA256=a47a554cb3055614a8041cf478c4c89e249c2157c7e98389fbaba6144dc18783
 ADD https://github.com/Intel-Media-SDK/MediaSDK/archive/intel-mediasdk-$MEDIASDK_VERSION.tar.gz /tmp/mediasdk.tar.gz
 
 ARG FFMPEG_VERSION=5.1.2-6
@@ -142,7 +144,7 @@ RUN set -ex; \
     cp --archive --parents --no-dereference /opt/intel /build; \
     rm -rf extractlibrary cplist
 
-FROM misotolar/jellyfin-server:f32a6884
+FROM misotolar/jellyfin-server:5dab0777
 
 LABEL mantainer="michal@sotolar.com"
 
