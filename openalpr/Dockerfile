@@ -1,21 +1,21 @@
-FROM ubuntu:bionic
+FROM ubuntu:jammy
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=6ead2fb8f72ac1929a2e04912c5795af0bf37761
-ARG SHA256=0a2a39bc22704d10cf935a59129d8cfc281d3c71781e54d6b9f37d22fdc1c061
+ARG VERSION=736ab0e608cf9b20d92f36a873bb1152240daa98
+ARG SHA256=2157aef52e5782cbb4117669f3ffdc125281f71c773b61d50f2133a2a3cb66fe
 ADD https://github.com/openalpr/openalpr/archive/$VERSION.tar.gz /tmp/openalpr.tar.gz 
 
-ARG OPENCV_VERSION=2.4.13.6
-ARG OPENCV_SHA256=6ecbeea11f68356b748e35f758f4406067d3a2f6339e4582c63373fa6c3f5a72
+ARG OPENCV_VERSION=4.7.0
+ARG OPENCV_SHA256=8df0079cdbe179748a18d44731af62a245a45ebf5085223dc03133954c662973
 ADD https://github.com/opencv/opencv/archive/$OPENCV_VERSION.tar.gz /tmp/opencv.tar.gz
 
-ARG LEPTONICA_VERSION=1.80.0
-ARG LEPTONICA_SHA256=ec9c46c2aefbb960fb6a6b7f800fe39de48343437b6ce08e30a8d9688ed14ba4
+ARG LEPTONICA_VERSION=1.82.0
+ARG LEPTONICA_SHA256=155302ee914668c27b6fe3ca9ff2da63b245f6d62f3061c8f27563774b8ae2d6
 ADD https://github.com/DanBloomberg/leptonica/releases/download/$LEPTONICA_VERSION/leptonica-$LEPTONICA_VERSION.tar.gz /tmp/leptonica.tar.gz
 
-ARG TESSERACT_VERSION=3.05.02
-ARG TESSERACT_SHA256=494d64ffa7069498a97b909a0e65a35a213989e0184f1ea15332933a90d43445
+ARG TESSERACT_VERSION=4.1.3
+ARG TESSERACT_SHA256=83dc56b544be938983f528c777e4e1d906205b0f6dc0110afc223f2cc1cec6d3
 ADD https://github.com/tesseract-ocr/tesseract/archive/$TESSERACT_VERSION.tar.gz /tmp/tesseract.tar.gz
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -25,9 +25,9 @@ ENV BEANSTALKD_LISTEN_ADDR 127.0.0.1
 ENV BEANSTALKD_LISTEN_PORT 11300
 
 RUN set -ex; \
-    echo "deb http://archive.ubuntu.com/ubuntu bionic main restricted universe multiverse" | tee /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu bionic-security main restricted universe multiverse" >> /etc/apt/sources.list; \
-    echo "deb http://archive.ubuntu.com/ubuntu bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" | tee /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu jammy-security main restricted universe multiverse" >> /etc/apt/sources.list; \
+    echo "deb http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get install --no-install-recommends -y \
@@ -39,24 +39,24 @@ RUN set -ex; \
         ca-certificates \
         cmake \
         curl \
-        git \
-        libavcodec57 \
+        libavcodec58 \
         libavcodec-dev \
-        libavformat57 \
+        libavformat58 \
         libavformat-dev \
-        libavresample3 \
-        libavresample-dev \
         libcurl4 \
         libcurl4-openssl-dev \
         libjpeg8 \
         libjpeg8-dev \
-        liblog4cplus-1.1-9 \
+        liblog4cplus-2.0.5 \
         liblog4cplus-dev \
-        libswscale4 \
+        libswscale5 \
         libswscale-dev \
+        libtiff5 \
+        libtiff5-dev \
         libtool \
         pkg-config \
-        tzdata; \
+        tzdata \
+    ; \
     mkdir -p /tmp/opencv; \
     echo "$OPENCV_SHA256  /tmp/opencv.tar.gz" | sha256sum --status -c -; \
     tar xf /tmp/opencv.tar.gz -C /tmp/opencv --strip-components=1; \
@@ -79,8 +79,9 @@ RUN set -ex; \
         -DWITH_IPP=OFF \
         .. \
     ; \
-    make; \
+    make -j$(nproc); \
     make install; \
+    \
     mkdir -p /tmp/leptonica; \
     echo "$LEPTONICA_SHA256  /tmp/leptonica.tar.gz" | sha256sum --status -c -; \
     tar xf /tmp/leptonica.tar.gz -C /tmp/leptonica --strip-components=1; \
@@ -89,6 +90,7 @@ RUN set -ex; \
     ./configure; \
     make -j$(nproc); \
     make install; \
+    \
     mkdir -p /tmp/tesseract; \
     echo "$TESSERACT_SHA256  /tmp/tesseract.tar.gz" | sha256sum --status -c -; \
     tar xf /tmp/tesseract.tar.gz -C /tmp/tesseract --strip-components=1; \
@@ -98,6 +100,7 @@ RUN set -ex; \
     make -j$(nproc); \
     make install; \
     ldconfig; \
+    \
     mkdir -p /tmp/openalpr; \
     echo "$SHA256  /tmp/openalpr.tar.gz" | sha256sum --status -c -; \
     tar xf /tmp/openalpr.tar.gz -C /tmp/openalpr --strip-components=1; \
@@ -126,6 +129,7 @@ RUN set -ex; \
         libjpeg8-dev \
         liblog4cplus-dev \
         libswscale-dev \
+        libtiff5-dev \
         libtool \
         pkg-config; \
     apt-get autoremove --purge -y; \
