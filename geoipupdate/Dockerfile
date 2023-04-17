@@ -2,8 +2,8 @@ FROM alpine:3.17
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=5.0.2
-ARG SHA256=f0f0ba08d2a884dfaf239adfeb08519c44693db56863aa582dcd2dc9913b0e81
+ARG VERSION=5.0.4
+ARG SHA256=9633f8fea35e586ff703fc96032022845165eaf7cfa6185c9bc2930f5c6c38a8
 ADD https://github.com/maxmind/geoipupdate/releases/download/v${VERSION}/geoipupdate_${VERSION}_linux_amd64.tar.gz /tmp/geoipupdate.tar.gz
 
 ENV GEOIPUPDATE_ACCOUNT_ID 0
