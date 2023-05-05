@@ -2,7 +2,7 @@ FROM debian:bullseye-slim
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG UNOSERVER_VERSION=1.3
+ARG UNOSERVER_VERSION=1.4
 ARG LIBREOFFICE_VERSION=4:7.4.5-1~bpo11+1
 
 ENV INTERFACE=127.0.0.1
