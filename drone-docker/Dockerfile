@@ -1,7 +1,7 @@
 FROM golang:1.17-alpine AS build
 
-ARG VERSION=20.14.2
-ARG SHA256=27253ba37a1d3c575c7c7e00cb922214b5cdceb91ebd1ded24a7665ce7baf1a7
+ARG VERSION=20.14.4
+ARG SHA256=ea751c6202679237fc235cc0ecb43da42790900d7ef642ca7ea902e3e0968740
 ADD https://github.com/drone-plugins/drone-docker/archive/refs/tags/v${VERSION}.tar.gz /tmp/drone-docker.tar.gz
 
 ARG CGO_ENABLED=0
@@ -14,7 +14,7 @@ RUN set -ex; \
     tar xf /tmp/drone-docker.tar.gz --strip-components=1; \
     go build -v -ldflags "-X main.version=${VERSION:0:8}" -a -tags netgo -o release/linux/amd64/drone-docker ./cmd/drone-docker
 
-FROM docker:23.0.4-dind
+FROM docker:24.0.0-dind
 
 LABEL mantainer="michal@sotolar.com"
 
