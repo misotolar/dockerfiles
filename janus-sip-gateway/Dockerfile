@@ -26,8 +26,8 @@ ARG LIBWEBSOCKETS_VERSION=4.3.2
 ARG LIBWEBSOCKETS_SHA256=6a85a1bccf25acc7e8e5383e4934c9b32a102880d1e4c37c70b27ae2a42406e1
 ADD https://github.com/warmcat/libwebsockets/archive/refs/tags/v${LIBWEBSOCKETS_VERSION}.tar.gz /tmp/libwebsockets.tar.gz
 
-ARG SOFIASIP_VERSION=1.13.11
-ARG SOFIASIP_SHA256=aaebd6b480ab8fa56e02eea2d33272d8a8fc49257b1b94daa7033569f50acc6c
+ARG SOFIASIP_VERSION=1.13.15
+ARG SOFIASIP_SHA256=846b3d5eef57702e8d18967070b538030252116af1500f4baa78ad068c5fdd64
 ADD https://github.com/freeswitch/sofia-sip/archive/refs/tags/v${SOFIASIP_VERSION}.tar.gz /tmp/sofia-sip.tar.gz
 
 WORKDIR /build
