@@ -39,4 +39,4 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/xtables-addons
     readme: xtables-addons/README.md
-    desc: "Debian Bullseye Xtables-addons backport"
+    desc: "Debian Bookworm Xtables-addons backport"

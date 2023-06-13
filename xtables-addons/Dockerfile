@@ -1,14 +1,14 @@
-FROM debian:bullseye-slim AS build
+FROM debian:bookworm-slim AS build
 
 ARG VERSION=3.23
 ARG RELEASE=1
-ARG DEBIAN_VERSION=3.13-1+deb11u1
-ARG DEBIAN_TESTING_VERSION=$VERSION-1
+ARG DEBIAN_VERSION=3.23-1
+ARG DEBIAN_TESTING_VERSION=$VERSION-$RELEASE
 
 ARG XTABLES_URL=https://inai.de/files/xtables-addons/xtables-addons-$VERSION.tar.xz
 ARG XTABLES_SHA256=25693c69afc756287058b422e6c18618f72708c7e1d984647ac7d1198a316914
 ARG XTABLES_DEBIAN_URL=http://deb.debian.org/debian/pool/main/x/xtables-addons/xtables-addons_$DEBIAN_VERSION.debian.tar.xz
-ARG XTABLES_DEBIAN_SHA256=45b5ab447d937efab14e95e751f2868b55f2f657109422f3af8a55bcd85e86ed
+ARG XTABLES_DEBIAN_SHA256=39510359008cb4e38f695bad4f14a0b571ee23e50eb538226d41ce5aa6351315
 ARG XTABLES_DEBIAN_TESTING_URL=http://deb.debian.org/debian/pool/main/x/xtables-addons/xtables-addons_$DEBIAN_TESTING_VERSION.debian.tar.xz
 ARG XTABLES_DEBIAN_TESTING_SHA256=39510359008cb4e38f695bad4f14a0b571ee23e50eb538226d41ce5aa6351315
 
@@ -17,15 +17,11 @@ ARG DEBEMAIL="michal@sotolar.com"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
+COPY config/debian.sources /etc/apt/sources.list.d/debian.sources
+
 WORKDIR /build
 
 RUN set -ex; \
-    echo "deb http://deb.debian.org/debian bullseye main contrib non-free" | tee /etc/apt/sources.list; \
-    echo "deb-src http://deb.debian.org/debian bullseye main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb-src http://deb.debian.org/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list; \
-    echo "deb-src http://security.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get build-dep -y \
