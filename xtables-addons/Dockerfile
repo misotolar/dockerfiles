@@ -44,7 +44,7 @@ RUN set -ex; \
     dch -v $VERSION-$RELEASE+misotolar "Backport {$VERSION} release"; \
     dpkg-buildpackage -us -uc -b
 
-FROM alpine:3.17
+FROM alpine:3.18
 
 LABEL maintainer="michal@sotolar.com"
 
