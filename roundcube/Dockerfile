@@ -1,9 +1,9 @@
-FROM php:8.0-fpm-alpine3.16
+FROM php:8.1-fpm-alpine3.18
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.6.1
-ARG SHA256=46c2f6ba34bcb7e57e47cb034bf338e5fc7dcceddda9212a2ef3bd3146d97bed
+ARG VERSION=1.6.2
+ARG SHA256=c898307d95cc48418cf95517ef52b5b0088c50014f67a6ef815763428a8043f0
 ADD https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz /usr/src/roundcubemail.tar.gz
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -33,6 +33,7 @@ RUN set -ex; \
         libtool \
         openldap-dev \
         postgresql-dev \
+        sqlite-dev \
     ; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-xpm; \
     docker-php-ext-configure ldap; \
@@ -41,21 +42,20 @@ RUN set -ex; \
         gd \
         intl \
         ldap \
-        opcache \
         pdo_mysql \
         pdo_pgsql \
+        pdo_sqlite \
         zip \
     ; \
-    pecl install imagick; \
-    pecl install redis; \
-    docker-php-ext-enable imagick redis; \
+    pecl install imagick redis; \
+    docker-php-ext-enable imagick opcache redis; \
     runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
             | tr ',' '\n' \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     )"; \
-    apk add --no-cache --virtual .roundcube-rundeps $runDeps; \
+    apk add --no-cache --virtual .roundcube-rundeps imagemagick $runDeps; \
     apk del --no-network .build-deps; \
     { \
         echo 'opcache.memory_consumption=128'; \
