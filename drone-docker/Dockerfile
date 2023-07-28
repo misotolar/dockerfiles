@@ -14,7 +14,7 @@ RUN set -ex; \
     tar xf /tmp/drone-docker.tar.gz --strip-components=1; \
     go build -v -ldflags "-X main.version=${VERSION:0:8}" -a -tags netgo -o release/linux/amd64/drone-docker ./cmd/drone-docker
 
-FROM docker:24.0.4-dind
+FROM docker:24.0.5-dind
 
 LABEL mantainer="michal@sotolar.com"
 
