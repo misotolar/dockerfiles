@@ -1,7 +1,7 @@
-FROM golang:1.17-alpine AS build
+FROM golang:1.21-alpine AS build
 
-ARG VERSION=20.14.4
-ARG SHA256=ea751c6202679237fc235cc0ecb43da42790900d7ef642ca7ea902e3e0968740
+ARG VERSION=20.14.5
+ARG SHA256=e30951a5df84e5dc89a70cb0f0f3ea107a19739e2c532622638ceb0e16aa54cf
 ADD https://github.com/drone-plugins/drone-docker/archive/refs/tags/v${VERSION}.tar.gz /tmp/drone-docker.tar.gz
 
 ARG CGO_ENABLED=0
