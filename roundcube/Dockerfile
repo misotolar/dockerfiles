@@ -2,8 +2,8 @@ FROM php:8.1-fpm-alpine3.18
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=1.6.2
-ARG SHA256=c898307d95cc48418cf95517ef52b5b0088c50014f67a6ef815763428a8043f0
+ARG VERSION=1.6.3
+ARG SHA256=5e60ccd50f62fb00c43d335ec08a9bdafbf2bdd02552256cc4009908b39ad98f
 ADD https://github.com/roundcube/roundcubemail/releases/download/${VERSION}/roundcubemail-${VERSION}-complete.tar.gz /usr/src/roundcubemail.tar.gz
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -75,7 +75,8 @@ RUN set -ex; \
         echo 'session.gc_maxlifetime=21600'; \
         echo 'session.gc_divisor=500'; \
         echo 'session.gc_probability=1'; \
-        echo 'zlib.output_compression=Off'; \
+        echo 'output_buffering=on'; \
+        echo 'zlib.output_compression=off'; \
     } > $PHP_INI_DIR/conf.d/roundcube-defaults.ini; \
     \
     { \
