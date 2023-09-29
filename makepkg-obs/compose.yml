@@ -1,0 +1,4 @@
+services:
+    makepkg-obs:
+        build: .
+        container_name: makepkg-obs
