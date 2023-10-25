@@ -2,13 +2,10 @@
 
 set -e
 
+sudo pacman -Syu --noconfirm
+
 if [[ -z "$BUILD_PATH" ]]; then
-    if [[ ! -z "$DRONE_STEP_NAME" ]]; then
-        BUILD_PATH=/drone/src/"$DRONE_STEP_NAME"
-    else
-        prinf "Build path not set.\n"
-        exit 1
-    fi
+    BUILD_PATH=/drone/src
 fi
 
 if [[ -z "$EXPORT_PATH" ]]; then
@@ -26,8 +23,6 @@ fi
 
 cp -r "$BUILD_PATH" /tmp/build
 cd /tmp/build
-
-sudo pacman -Syu --noconfirm
 
 if [[ -d /tmp/build/keys/pgp ]]; then
     echo '==> Importing PGP keys...'
