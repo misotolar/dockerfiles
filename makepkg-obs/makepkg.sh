@@ -34,4 +34,8 @@ rsync -avu --delete --exclude=".*" --exclude="*/" /tmp/build/ "/home/build/$OBS_
 
 cd "/home/build/$OBS_PROJECT/$OBS_PACKAGE"
 osc addremove
-osc commit -n
+if [[ -z "$DRONE_COMMIT_MESSAGE" ]]; then
+    osc commit -n
+else
+    osc commit -m "$DRONE_COMMIT_MESSAGE"
+fi
