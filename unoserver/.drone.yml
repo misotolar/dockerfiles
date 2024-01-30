@@ -39,4 +39,4 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/unoserver
     readme: unoserver/README.md
-    desc: "Unoserver Debian Bullseye image"
+    desc: "Unoserver Debian Bookworm image"
