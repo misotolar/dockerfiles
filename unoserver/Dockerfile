@@ -2,11 +2,13 @@ FROM debian:bookworm-slim
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG UNOSERVER_VERSION=1.4
+ARG UNOSERVER_VERSION=2.0.1
 ARG LIBREOFFICE_VERSION=4:7.4.7-1+deb12u1
 
 ENV INTERFACE=127.0.0.1
-ENV PORT=2002
+ENV PORT=2003
+ENV UNO_INTERFACE=127.0.0.1
+ENV UNO_PORT=2002
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
@@ -38,5 +40,5 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 STOPSIGNAL SIGKILL
 ENTRYPOINT ["entrypoint.sh"]
-CMD unoserver --interface $INTERFACE --port $PORT
+CMD unoserver --interface $INTERFACE --uno-interface $UNO_INTERFACE --port $PORT --uno-port $UNO_PORT
 
