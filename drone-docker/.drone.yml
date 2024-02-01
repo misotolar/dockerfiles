@@ -24,7 +24,6 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/drone-docker
     dockerfile: drone-docker/Dockerfile
-    cache_from: misotolar/drone-docker
     context: ./drone-docker
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
