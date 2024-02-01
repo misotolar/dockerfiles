@@ -1,27 +1,26 @@
 FROM debian:bookworm-slim AS build
 
-ARG VERSION=3.23
+ARG VERSION=3.25
 ARG RELEASE=1
 ARG DEBIAN_VERSION=3.23-1
 ARG DEBIAN_TESTING_VERSION=$VERSION-$RELEASE
 
 ARG XTABLES_URL=https://inai.de/files/xtables-addons/xtables-addons-$VERSION.tar.xz
-ARG XTABLES_SHA256=25693c69afc756287058b422e6c18618f72708c7e1d984647ac7d1198a316914
+ARG XTABLES_SHA256=8c9f4c6a8e92eb7cfbf03f4ebcb1e1e793256c2efd0226d83312bfb0ffe14b84
 ARG XTABLES_DEBIAN_URL=http://deb.debian.org/debian/pool/main/x/xtables-addons/xtables-addons_$DEBIAN_VERSION.debian.tar.xz
 ARG XTABLES_DEBIAN_SHA256=39510359008cb4e38f695bad4f14a0b571ee23e50eb538226d41ce5aa6351315
 ARG XTABLES_DEBIAN_TESTING_URL=http://deb.debian.org/debian/pool/main/x/xtables-addons/xtables-addons_$DEBIAN_TESTING_VERSION.debian.tar.xz
-ARG XTABLES_DEBIAN_TESTING_SHA256=39510359008cb4e38f695bad4f14a0b571ee23e50eb538226d41ce5aa6351315
+ARG XTABLES_DEBIAN_TESTING_SHA256=42a2e1e5db8d6214d33ed87190fbdbedfa20865cf17a3a63b7533b0bf27e6b60
 
 ARG DEBFULLNAME="Michal Sotolar"
 ARG DEBEMAIL="michal@sotolar.com"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
-COPY config/debian.sources /etc/apt/sources.list.d/debian.sources
-
 WORKDIR /build
 
 RUN set -ex; \
+    sed -i 's/^Types: deb/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources; \
     apt-get update -y; \
     apt-get upgrade -y; \
     apt-get build-dep -y \

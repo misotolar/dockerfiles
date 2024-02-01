@@ -24,7 +24,6 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/xtables-addons
     dockerfile: xtables-addons/Dockerfile
-    cache_from: misotolar/xtables-addons:latest
     context: ./xtables-addons
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
