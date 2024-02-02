@@ -1,6 +1,0 @@
-services:
-    shorewall:
-        build: .
-        container_name: shorewall
-        volumes:
-            - /etc/localtime:/etc/localtime:ro
