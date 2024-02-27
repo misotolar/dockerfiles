@@ -6,7 +6,7 @@ set -e
 : "${PLUGIN_SOURCE:=./}"
 
 if [[ -z "$PLUGIN_REMOTE" ]]; then
-    prinf "Remote host not set.\n"
+    print "Remote host not set.\n"
     exit 1
 fi
 
@@ -16,12 +16,12 @@ if [[ -z "$PLUGIN_TARGET" ]]; then
 fi
 
 if [[ -z "$PLUGIN_USERNAME" ]]; then
-    prinf "Remote user not set.\n"
+    print "Remote user not set.\n"
     exit 1
 fi
 
 if [[ -z "$PLUGIN_PASSWORD" ]]; then
-    prinf "Remote password not set.\n"
+    print "Remote password not set.\n"
     exit 1
 fi
 

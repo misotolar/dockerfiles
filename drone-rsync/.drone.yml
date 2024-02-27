@@ -24,7 +24,6 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/drone-rsync
     dockerfile: drone-rsync/Dockerfile
-    cache_from: misotolar/drone-rsync:latest
     context: ./drone-rsync
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
