@@ -4,6 +4,7 @@ set -e
 
 : "${PLUGIN_PORT:=22}"
 : "${PLUGIN_SOURCE:=./}"
+: "${PLUGIN_TARGET_BRANCH:=false}"
 
 if [[ -z "$PLUGIN_REMOTE" ]]; then
     print "Remote host not set.\n"
@@ -48,5 +49,9 @@ for filter in "${FILTER[@]}"; do
 done
 
 EXPR="$EXPR $PLUGIN_SOURCE"
+
+if [ $PLUGIN_TARGET_BRANCH == true ] && [ $DRONE_BRANCH != "master" ]; then
+    PLUGIN_TARGET="$PLUGIN_TARGET.$DRONE_BRANCH"
+fi
 
 eval "$(printf "$EXPR" "$PLUGIN_PASSWORD" "$PLUGIN_PORT") $PLUGIN_USERNAME@$PLUGIN_REMOTE:$PLUGIN_TARGET"
