@@ -1,0 +1,6 @@
+services:
+    nut:
+        build: .
+        container_name: nut
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
