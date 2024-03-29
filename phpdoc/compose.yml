@@ -1,0 +1,6 @@
+services:
+    phpdoc:
+        build: .
+        container_name: phpdoc
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
