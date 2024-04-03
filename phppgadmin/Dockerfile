@@ -1,10 +1,10 @@
-FROM php:7.4-fpm-alpine3.14
+FROM php:8.2-fpm-alpine3.19
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=7-13-0
-ARG SHA256=8694707ebff7bf4357b2920dacf12344e2c6d62c8143dc0f65794f50756c90fd
-ADD https://github.com/phppgadmin/phppgadmin/archive/REL_${VERSION}.tar.gz /usr/src/phpPgAdmin.tar.gz
+ARG VERSION=7.14.7-mod
+ARG SHA256=7c0e89922abcf88fd81a52590930f3b5121032d1d37234a54a8f6415152dc292
+ADD https://github.com/ReimuHakurei/phpPgAdmin/archive/refs/tags/v$VERSION.tar.gz /usr/src/phppgadmin.tar.gz
 
 ENV PHP_MAX_EXECUTION_TIME 600
 ENV PHP_UPLOAD_LIMIT 2048K
@@ -45,7 +45,7 @@ RUN set -ex; \
         echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
         echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/phppgadmin-misc.ini; \
-    echo "$SHA256 */usr/src/phpPgAdmin.tar.gz" | sha256sum -c -; \
+    echo "$SHA256 */usr/src/phppgadmin.tar.gz" | sha256sum -c -; \
     rm -rf \
         /usr/src/php.tar.xz \
         /usr/src/php.tar.xz.asc \
@@ -55,7 +55,7 @@ RUN set -ex; \
 
 COPY config.inc.php /usr/local/etc/phppgadmin/config.inc.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY exclude.txt /usr/src/phpPgAdmin.exclude
+COPY exclude.txt /usr/src/phppgadmin.exclude
 
 VOLUME /usr/local/phppgadmin
 

@@ -24,7 +24,6 @@ steps:
       from_secret: DOCKER_PASSWORD
     repo: misotolar/phppgadmin
     dockerfile: phppgadmin/Dockerfile
-    cache_from: misotolar/phppgadmin:latest
     context: ./phppgadmin
     tags:
     - ${DRONE_COMMIT_SHA:0:8}
