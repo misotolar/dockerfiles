@@ -11,6 +11,7 @@ jellyfin-server/.drone.yml
 makepkg/.drone.yml
 makepkg-obs/.drone.yml
 mjpg-streamer/.drone.yml
+nginx/.drone.yml
 node-media-server/.drone.yml
 nut/.drone.yml
 openalpr/.drone.yml
