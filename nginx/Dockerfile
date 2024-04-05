@@ -144,6 +144,7 @@ RUN set -ex; \
         coreutils \
         openssl \
         tzdata \
+        util-linux \
         $(cat /tmp/runDeps.txt) \
     ; \
     mkdir -p /usr/local/nginx/errors; \
