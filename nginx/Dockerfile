@@ -119,6 +119,11 @@ FROM alpine:3.19
 
 LABEL maintainer="michal@sotolar.com"
 
+ARG OCSP_FETCHER_VERSION=18d9652fac2d3f9e7d5f88c64be72af30b7e82d2
+ADD https://raw.githubusercontent.com/tomwassenberg/certbot-ocsp-fetcher/$OCSP_FETCHER_VERSION/certbot-ocsp-fetcher /usr/local/sbin/certbot-ocsp-fetcher
+
+ENV OCSP_RESPONSE_PATH=/usr/local/nginx/ocsp
+
 COPY --from=build /var/run/nginx /var/run/nginx
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY --from=build /usr/local/sbin/nginx /usr/local/sbin/nginx
@@ -129,6 +134,9 @@ WORKDIR /usr/local/nginx
 
 RUN set -ex; \
     apk add --no-cache \
+        bash \
+        coreutils \
+        openssl \
         tzdata \
         $(cat /tmp/runDeps.txt) \
     ; \
@@ -137,6 +145,7 @@ RUN set -ex; \
     touch /usr/local/nginx/logs/error.log; \
     ln -sf /dev/stderr /usr/local/nginx/logs/error.log; \
     adduser -u 82 -D -S -G www-data www-data; \
+    chmod 755 /usr/local/sbin/certbot-ocsp-fetcher; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
