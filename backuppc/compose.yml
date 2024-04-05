@@ -1,0 +1,6 @@
+services:
+    backuppc:
+        build: .
+        container_name: backuppc
+        volumes:
+            - /etc/localtime:/etc/localtime:ro

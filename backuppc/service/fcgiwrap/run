@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm -rf /var/run/fcgiwrap/fcgiwrap.sock
+
+exec spawn-fcgi -n -s /var/run/fcgiwrap/fcgiwrap.sock -u "$BACKUPPC_UUID" -g 82 -M 0770 -- /usr/bin/fcgiwrap
