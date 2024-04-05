@@ -84,6 +84,7 @@ RUN set -ex; \
         --with-http_ssl_module \
         --with-http_v2_module \
         --with-http_v3_module \
+        --with-http_sub_module \
         --with-http_auth_request_module \
         --with-http_gzip_static_module \
         --without-http_geo_module \
@@ -122,12 +123,17 @@ LABEL maintainer="michal@sotolar.com"
 ARG OCSP_FETCHER_VERSION=18d9652fac2d3f9e7d5f88c64be72af30b7e82d2
 ADD https://raw.githubusercontent.com/tomwassenberg/certbot-ocsp-fetcher/$OCSP_FETCHER_VERSION/certbot-ocsp-fetcher /usr/local/sbin/certbot-ocsp-fetcher
 
+ARG ERROR_PAGES_VERSION=17554bced347ecea9bd1363f1b96738b1c3d74e3
+ADD https://github.com/denysvitali/nginx-error-pages/archive/$ERROR_PAGES_VERSION.tar.gz /tmp/error-pages.tar.gz
+
 ENV OCSP_RESPONSE_PATH=/usr/local/nginx/ocsp
 
 COPY --from=build /var/run/nginx /var/run/nginx
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY --from=build /usr/local/sbin/nginx /usr/local/sbin/nginx
 COPY --from=build /build/runDeps.txt /tmp/runDeps.txt
+
+COPY snippets /usr/local/nginx/snippets
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 WORKDIR /usr/local/nginx
@@ -140,6 +146,8 @@ RUN set -ex; \
         tzdata \
         $(cat /tmp/runDeps.txt) \
     ; \
+    mkdir -p /usr/local/nginx/errors; \
+    tar xf /tmp/error-pages.tar.gz -C /usr/local/nginx/errors --strip-components=1; \
     touch /usr/local/nginx/logs/access.log; \
     ln -sf /dev/stdout /usr/local/nginx/logs/access.log; \
     touch /usr/local/nginx/logs/error.log; \
