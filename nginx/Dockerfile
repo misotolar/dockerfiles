@@ -4,8 +4,8 @@ ARG VERSION=1.25.4
 ARG SHA256=760729901acbaa517996e681ee6ea259032985e37c2768beef80df3a877deed9
 ADD http://nginx.org/download/nginx-$VERSION.tar.gz /tmp/nginx.tar.gz
 
-ARG OPENSSL_VERSION=3.2.1
-ARG OPENSSL_SHA256=83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39
+ARG OPENSSL_VERSION=3.3.0
+ARG OPENSSL_SHA256=53e66b043322a606abf0087e7699a0e033a37fa13feb9742df35c3a33b18fb02
 ADD https://github.com/openssl/openssl/releases/download/openssl-$OPENSSL_VERSION/openssl-$OPENSSL_VERSION.tar.gz /tmp/openssl.tar.gz
 
 ARG BROTLI_VERSION=a71f9312c2deb28875acc7bacfdd5695a111aa53
