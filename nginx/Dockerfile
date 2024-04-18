@@ -1,7 +1,7 @@
 FROM alpine:3.19 as build
 
-ARG VERSION=1.25.4
-ARG SHA256=760729901acbaa517996e681ee6ea259032985e37c2768beef80df3a877deed9
+ARG VERSION=1.25.5
+ARG SHA256=2fe2294f8af4144e7e842eaea884182a84ee7970e11046ba98194400902bbec0
 ADD http://nginx.org/download/nginx-$VERSION.tar.gz /tmp/nginx.tar.gz
 
 ARG OPENSSL_VERSION=3.3.0
@@ -126,8 +126,6 @@ ADD https://raw.githubusercontent.com/tomwassenberg/certbot-ocsp-fetcher/$OCSP_F
 ARG ERROR_PAGES_VERSION=17554bced347ecea9bd1363f1b96738b1c3d74e3
 ADD https://github.com/denysvitali/nginx-error-pages/archive/$ERROR_PAGES_VERSION.tar.gz /tmp/error-pages.tar.gz
 
-ENV OCSP_RESPONSE_PATH=/usr/local/nginx/ocsp
-
 COPY --from=build /var/run/nginx /var/run/nginx
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY --from=build /usr/local/sbin/nginx /usr/local/sbin/nginx
@@ -153,7 +151,6 @@ RUN set -ex; \
     ln -sf /dev/stdout /usr/local/nginx/logs/access.log; \
     touch /usr/local/nginx/logs/error.log; \
     ln -sf /dev/stderr /usr/local/nginx/logs/error.log; \
-    adduser -u 82 -D -S -G www-data www-data; \
     chmod 755 /usr/local/sbin/certbot-ocsp-fetcher; \
     rm -rf \
         /var/cache/apk/* \
