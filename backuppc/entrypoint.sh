@@ -2,10 +2,8 @@
 
 set -e
 
-BACKUPPC_UUID="${BACKUPPC_UUID:-1000}"
-BACKUPPC_GUID="${BACKUPPC_GUID:-1000}"
-BACKUPPC_USERNAME=$(getent passwd "$BACKUPPC_UUID" | cut -d: -f1)
-BACKUPPC_GROUPNAME=$(getent group "$BACKUPPC_GUID" | cut -d: -f1)
+BACKUPPC_USER=$(getent passwd "$BACKUPPC_UUID" | cut -d: -f1)
+BACKUPPC_GROUP=$(getent group "$BACKUPPC_GUID" | cut -d: -f1)
 
 if [ -f /usr/src/backuppc.tar.gz ]; then
     echo 'First run of the container. BackupPC will be installed.'
@@ -15,22 +13,22 @@ if [ -f /usr/src/backuppc.tar.gz ]; then
         ln -s /usr/bin/bzip2 /bin/bzip2
     fi
 
-    if [ -z "$BACKUPPC_GROUPNAME" ]; then
-        groupadd -r -g "$BACKUPPC_GUID" backuppc
-        BACKUPPC_GROUPNAME="backuppc"
+    if [ -z "$BACKUPPC_GROUP" ]; then
+        BACKUPPC_GROUP="backuppc"
+        groupadd -r -g "$BACKUPPC_GUID" "$BACKUPPC_GROUP"
     fi
 
-    if [ -z "$BACKUPPC_USERNAME" ]; then
-		useradd -r -d /home/backuppc -g "$BACKUPPC_GUID" -u "$BACKUPPC_UUID" -M -N backuppc
-		BACKUPPC_USERNAME="backuppc"
+    if [ -z "$BACKUPPC_USER" ]; then
+        BACKUPPC_USER="backuppc"
+		useradd -r -d /home/backuppc -g "$BACKUPPC_GUID" -u "$BACKUPPC_UUID" -M -N "$BACKUPPC_USER"
 	else
-		usermod -d /home/backuppc "$BACKUPPC_USERNAME"
+		usermod -d /home/backuppc "$BACKUPPC_USER"
 	fi
 
-	chown "$BACKUPPC_USERNAME":"$BACKUPPC_GROUPNAME" /home/backuppc
+	chown "$BACKUPPC_USER":"$BACKUPPC_GROUP" /home/backuppc
 
     if [ ! -f /home/backuppc/.ssh/id_rsa ]; then
-		su "$BACKUPPC_USERNAME" -s /bin/sh -c "ssh-keygen -t rsa -N '' -f /home/backuppc/.ssh/id_rsa"
+		su "$BACKUPPC_USER" -s /bin/sh -c "ssh-keygen -t rsa -N '' -f /home/backuppc/.ssh/id_rsa"
 	fi
 
     mkdir -p /usr/src/backuppc && cd /usr/src/backuppc
@@ -47,16 +45,13 @@ if [ -f /usr/src/backuppc.tar.gz ]; then
         --html-dir /var/www/html/BackupPC \
         --html-dir-url /BackupPC \
         --install-dir /usr/local/BackupPC \
-        --backuppc-user "$BACKUPPC_USERNAME"
+        --backuppc-user "$BACKUPPC_USER"
 
     cd /home/backuppc
     rm -rf /usr/src/*
 fi
 
-export BACKUPPC_UUID
-export BACKUPPC_GUID
-export BACKUPPC_USERNAME
-export BACKUPPC_GROUPNAME
+export BACKUPPC_USER
 
 rsync -rlD --delete /var/www/html/ /var/www/backuppc
 

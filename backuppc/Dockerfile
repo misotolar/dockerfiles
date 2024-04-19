@@ -14,6 +14,10 @@ ARG RSYNC_VERSION=3.1.3.0
 ARG RSYNC_SHA256=3eeb137319b608512b2d23c54ea8b52b511db806ffbd5fa730a394431d556f3f
 ADD https://github.com/backuppc/rsync-bpc/releases/download/$RSYNC_VERSION/rsync-bpc-$RSYNC_VERSION.tar.gz /tmp/rsync-bpc.tar.gz
 
+ENV BACKUPPC_UUID=1000
+ENV BACKUPPC_GUID=1000
+ENV BACKUPPC_FCGI=/var/run/fcgiwrap/fcgiwrap.sock
+
 RUN set -ex; \
     apk add --no-cache \
         apache2-utils \
