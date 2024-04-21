@@ -1,3 +1,4 @@
+alpine/.drone.yml
 asterisk/.drone.yml
 backuppc/.drone.yml
 curl-jq/.drone.yml
