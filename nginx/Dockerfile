@@ -1,4 +1,4 @@
-FROM alpine:3.19 as build
+FROM misotolar/alpine:3.19.1 as build
 
 ARG VERSION=1.25.5
 ARG SHA256=2fe2294f8af4144e7e842eaea884182a84ee7970e11046ba98194400902bbec0
@@ -116,7 +116,7 @@ RUN set -ex; \
 			| xargs -r apk info --installed \
 			| sort -u > /build/runDeps.txt
 
-FROM alpine:3.19
+FROM misotolar/alpine:3.19.1
 
 LABEL maintainer="michal@sotolar.com"
 
@@ -152,8 +152,6 @@ RUN set -ex; \
     touch /usr/local/nginx/logs/error.log; \
     ln -sf /dev/stderr /usr/local/nginx/logs/error.log; \
     chmod 755 /usr/local/sbin/certbot-ocsp-fetcher; \
-    mkdir -p /usr/local/etc/entrypoint-hooks.d; \
-    mkdir -p /usr/local/etc/entrypoint-post-hooks.d; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
