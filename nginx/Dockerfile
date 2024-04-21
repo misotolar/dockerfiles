@@ -152,6 +152,8 @@ RUN set -ex; \
     touch /usr/local/nginx/logs/error.log; \
     ln -sf /dev/stderr /usr/local/nginx/logs/error.log; \
     chmod 755 /usr/local/sbin/certbot-ocsp-fetcher; \
+    mkdir -p /usr/local/etc/entrypoint-hooks.d; \
+    mkdir -p /usr/local/etc/entrypoint-post-hooks.d; \
     rm -rf \
         /var/cache/apk/* \
         /var/tmp/* \
