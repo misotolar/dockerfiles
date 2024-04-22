@@ -1,41 +1,36 @@
 #!/bin/bash
 
+set -ex
+
 if [ ! -d /usr/src/tt-rss ]; then
 	mkdir -p /usr/src/tt-rss
 	tar -xf /usr/src/tt-rss.tar.gz -C /usr/src/tt-rss --exclude-from=/usr/src/tt-rss.exclude --strip-components=1
 fi
 
-if [ ! -e index.php ]; then
-	rsync -rlD --delete /usr/src/tt-rss/ /usr/local/tt-rss
-else
-	rsync -rlD --delete --exclude-from /usr/src/tt-rss.exclude /usr/src/tt-rss/ /usr/local/tt-rss
+if [ ! -d /usr/src/tt-rss-feedly-theme ]; then
+	mkdir -p /usr/src/tt-rss-feedly-theme
+	tar -xf /usr/src/tt-rss-feedly-theme.tar.gz -C /usr/src/tt-rss-feedly-theme --exclude-from=/usr/src/tt-rss.exclude --strip-components=1
 fi
 
-if [ ! -d /usr/src/ttrss-nginx-xaccel ]; then
-	mkdir -p /usr/src/ttrss-nginx-xaccel
-	tar -xf /usr/src/ttrss-nginx-xaccel.tar.gz -C /usr/src/ttrss-nginx-xaccel --strip-components=1
-fi
+rsync -rlD --delete --exclude-from /usr/src/tt-rss.exclude /usr/src/tt-rss/ /usr/local/tt-rss/html
+rsync -rlD --delete --exclude-from /usr/src/tt-rss.exclude /usr/src/tt-rss-feedly-theme/ /usr/local/tt-rss/html/themes.local
 
-rsync -rlD --delete /usr/src/ttrss-nginx-xaccel/ /usr/local/tt-rss/plugins.local/nginx_xaccel
-
-cp /etc/tt-rss/config.php config.php
+mkdir -p /usr/local/tt-rss/conf.d
+cp /usr/src/config.php /usr/local/tt-rss/html/config.php
 
 for d in plugins.local templates.local themes.local; do
-	if [ ! -d /usr/local/tt-rss/$d ]; then
-		mkdir -p /usr/local/tt-rss/$d
-	fi
+	if [ ! -d /usr/local/tt-rss/html/$d ]; then mkdir -p /usr/local/tt-rss/html/$d; fi
 done
 
-for d in cache lock feed-icons; do
-	if [ ! -d /usr/local/tt-rss/$d ]; then
-		mkdir -p /usr/local/tt-rss/$d
-	fi
-	
-	chown -R www-data:www-data /usr/local/tt-rss/$d
-	chmod 750 /usr/local/tt-rss/$d
-	find /usr/local/tt-rss/$d -type f -exec chmod 660 {} \;
+for d in "$TTRSS_CACHE_DIR" "$TTRSS_CACHE_DIR"/export "$TTRSS_CACHE_DIR"/feeds "$TTRSS_CACHE_DIR"/images "$TTRSS_CACHE_DIR"/upload "$TTRSS_LOCK_DIRECTORY" /usr/local/tt-rss/html/feed-icons; do
+	if [ ! -d $d ]; then mkdir -p $d; fi
+
+	chmod 0750 $d && find $d -type f -exec chmod 666 {} \;
+	chown -R www-data:www-data $d
 done
 
-sudo -u www-data -E /usr/local/bin/php ./update.php --update-schema=force-yes
+sudo -u www-data -E "$TTRSS_PHP_EXECUTABLE" /usr/local/tt-rss/html/update.php --update-schema=force-yes
+
+export TTRSS_PHP_EXECUTABLE
 
 exec "$@"

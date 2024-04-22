@@ -1,6 +1,6 @@
-/plugins.local/
-/templates.local/
-/themes.local/
-/feed-icons/
-/cache/
-/lock/
+/cache
+/feed-icons
+/lock
+/plugins.local
+/templates.local
+/themes.local

@@ -1,20 +1,22 @@
-FROM php:8.2-fpm-alpine3.18
+FROM php:8.3-fpm-alpine3.19
 
 LABEL maintainer="michal@sotolar.com"
 
-ARG VERSION=faefedb950b9fb9770bbd7f1dbd0d35c1ce6b5c3
-ARG SHA256=2edd42fde3ff0ab99b3dcc2b562075d8ab3723767908037d81a708a580e3a792
+ARG VERSION=d832907125a7711397da8ade5cfb51082d802542
+ARG SHA256=21754aa85eaa4a5de1aba6e076f26ca3c356a4d6e70ae7e1d9e6ea6d12de1d65
 ADD https://gitlab.tt-rss.org/tt-rss/tt-rss/-/archive/$VERSION/tt-rss-$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
-ARG TTRSS_NGINX_ACCEL_VERSION=3b4e12ff06cdac025edf45077f79039704779cc6
-ARG TTRSS_NGINX_ACCEL_SHA256=67c628c39b4d996e54d259043124a348323a28a008140b919ef2d4816f7a01a5
-ADD https://gitlab.tt-rss.org/tt-rss/plugins/ttrss-nginx-xaccel/-/archive/$TTRSS_NGINX_ACCEL_VERSION/ttrss-nginx-xaccel-$TTRSS_NGINX_ACCEL_VERSION.tar.gz /usr/src/ttrss-nginx-xaccel.tar.gz
+ARG FEEDLY_VERSION=9b50cee70e1ed77d27a273e267c2f50455a23e6f
+ARG FEEDLY_SHA256=b88aa875a3e8044ce1ad0b0ecea31fcf65146ed3a79ffca10fce6309bc460083
+ADD https://github.com/levito/tt-rss-feedly-theme/archive/$FEEDLY_VERSION.tar.gz /usr/src/tt-rss-feedly-theme.tar.gz
 
 ENV PHP_MAX_EXECUTION_TIME 300
 ENV PHP_MEMORY_LIMIT 64M
 
 ENV TTRSS_MYSQL_CHARSET="UTF8"
 ENV TTRSS_PHP_EXECUTABLE="/usr/local/bin/php"
+ENV TTRSS_LOCK_DIRECTORY="/usr/local/tt-rss/lock"
+ENV TTRSS_CACHE_DIR="/usr/local/tt-rss/cache"
 ENV TTRSS_PLUGINS="auth_internal"
 
 WORKDIR /usr/local/tt-rss
@@ -25,6 +27,7 @@ RUN set -ex; \
         ca-certificates \
         coreutils \
         rsync \
+        runit \
         sudo \
         tzdata \
     ; \
@@ -46,6 +49,7 @@ RUN set -ex; \
         intl \
         opcache \
         pcntl \
+        pgsql \
         pdo_mysql \
         pdo_pgsql \
         zip \
@@ -85,7 +89,7 @@ RUN set -ex; \
         echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/tt-rss-misc.ini; \
     echo "$SHA256 */usr/src/tt-rss.tar.gz" | sha256sum -c -; \
-    echo "$TTRSS_NGINX_ACCEL_SHA256 */usr/src/ttrss-nginx-xaccel.tar.gz" | sha256sum -c -; \
+    echo "$FEEDLY_SHA256 */usr/src/tt-rss-feedly-theme.tar.gz" | sha256sum -c -; \
     rm -rf \
         /usr/src/php.tar.xz \
         /usr/src/php.tar.xz.asc \
@@ -93,13 +97,15 @@ RUN set -ex; \
         /var/tmp/* \
         /tmp/*
 
-WORKDIR /usr/local/tt-rss
-
-COPY config.php /etc/tt-rss/config.php
+COPY config.php /usr/src/config.php
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY exclude.txt /usr/src/tt-rss.exclude
+COPY service /etc/service
 
-VOLUME /usr/local/tt-rss
+VOLUME /usr/local/tt-rss/html
+VOLUME /usr/local/tt-rss/cache
+VOLUME /usr/local/tt-rss/conf.d
+VOLUME /usr/local/tt-rss/lock
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["php-fpm"]
+CMD ["runsvdir", "-P", "/etc/service"]
