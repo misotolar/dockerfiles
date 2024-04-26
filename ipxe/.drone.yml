@@ -1,0 +1,42 @@
+kind: pipeline
+type: docker
+name: default
+
+clone:
+  disable: true
+
+steps:
+
+- name: clone
+  image: alpine/git
+  commands:
+  - git init --quiet
+  - git remote add origin $DRONE_REMOTE_URL
+  - git fetch --quiet --depth=1 origin "+refs/heads/$DRONE_BRANCH:"
+  - git checkout $DRONE_COMMIT -b $DRONE_BRANCH
+
+- name: publish
+  image: misotolar/drone-docker
+  settings:
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/ipxe
+    dockerfile: ipxe/Dockerfile
+    cache_from: misotolar/ipxe:latest
+    context: ./ipxe
+    tags:
+    - ${DRONE_COMMIT_SHA:0:8}
+    - latest
+
+- name: update
+  image: misotolar/drone-docker-update
+  settings: 
+    username: 
+      from_secret: DOCKER_USERNAME
+    password:
+      from_secret: DOCKER_PASSWORD
+    repo: misotolar/ipxe
+    readme: ipxe/README.md
+    desc: "iPXE binaries Debian Bookworm build"

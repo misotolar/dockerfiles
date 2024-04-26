@@ -1,0 +1,6 @@
+services:
+    ipxe:
+        build: .
+        container_name: ipxe
+        volumes:
+            - /etc/localtime:/etc/localtime:ro

@@ -7,12 +7,14 @@ drone-docker-update/.drone.yml
 drone-rsync/.drone.yml
 fontello/.drone.yml
 geoipupdate/.drone.yml
+ipxe/.drone.yml
 janus-sip-gateway/.drone.yml
 jellyfin/.drone.yml
 jellyfin-server/.drone.yml
 makepkg/.drone.yml
 makepkg-obs/.drone.yml
 mjpg-streamer/.drone.yml
+netboot/.drone.yml
 nginx/.drone.yml
 node-media-server/.drone.yml
 nut/.drone.yml
