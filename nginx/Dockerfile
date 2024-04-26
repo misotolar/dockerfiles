@@ -1,7 +1,7 @@
 FROM misotolar/alpine:3.19.1 as build
 
-ARG VERSION=1.25.5
-ARG SHA256=2fe2294f8af4144e7e842eaea884182a84ee7970e11046ba98194400902bbec0
+ARG VERSION=1.26.0
+ARG SHA256=d2e6c8439d6c6db5015d8eaab2470ab52aef85a7bf363182879977e084370497
 ADD http://nginx.org/download/nginx-$VERSION.tar.gz /tmp/nginx.tar.gz
 
 ARG OPENSSL_VERSION=3.3.0
