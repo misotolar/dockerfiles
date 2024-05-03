@@ -6,6 +6,10 @@ ARG VERSION=d832907125a7711397da8ade5cfb51082d802542
 ARG SHA256=21754aa85eaa4a5de1aba6e076f26ca3c356a4d6e70ae7e1d9e6ea6d12de1d65
 ADD https://gitlab.tt-rss.org/tt-rss/tt-rss/-/archive/$VERSION/tt-rss-$VERSION.tar.gz /usr/src/tt-rss.tar.gz
 
+ARG NGINX_ACCEL_VERSION=3b4e12ff06cdac025edf45077f79039704779cc6
+ARG NGINX_ACCEL_SHA256=67c628c39b4d996e54d259043124a348323a28a008140b919ef2d4816f7a01a5
+ADD https://gitlab.tt-rss.org/tt-rss/plugins/ttrss-nginx-xaccel/-/archive/$NGINX_ACCEL_VERSION/ttrss-nginx-xaccel-$NGINX_ACCEL_VERSION.tar.gz /usr/src/tt-rss-nginx-xaccel.tar.gz
+
 ARG FEEDLY_VERSION=9b50cee70e1ed77d27a273e267c2f50455a23e6f
 ARG FEEDLY_SHA256=b88aa875a3e8044ce1ad0b0ecea31fcf65146ed3a79ffca10fce6309bc460083
 ADD https://github.com/levito/tt-rss-feedly-theme/archive/$FEEDLY_VERSION.tar.gz /usr/src/tt-rss-feedly-theme.tar.gz
@@ -89,6 +93,7 @@ RUN set -ex; \
         echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
     } > $PHP_INI_DIR/conf.d/tt-rss-misc.ini; \
     echo "$SHA256 */usr/src/tt-rss.tar.gz" | sha256sum -c -; \
+    echo "$NGINX_ACCEL_SHA256 */usr/src/tt-rss-nginx-xaccel.tar.gz" | sha256sum -c -; \
     echo "$FEEDLY_SHA256 */usr/src/tt-rss-feedly-theme.tar.gz" | sha256sum -c -; \
     rm -rf \
         /usr/src/php.tar.xz \

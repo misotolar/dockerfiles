@@ -7,12 +7,18 @@ if [ ! -d /usr/src/tt-rss ]; then
 	tar -xf /usr/src/tt-rss.tar.gz -C /usr/src/tt-rss --exclude-from=/usr/src/tt-rss.exclude --strip-components=1
 fi
 
+if [ ! -d /usr/src/tt-rss-nginx-xaccel ]; then
+	mkdir -p /usr/src/tt-rss-nginx-xaccel
+	tar -xf /usr/src/tt-rss-nginx-xaccel.tar.gz -C /usr/src/tt-rss-nginx-xaccel --exclude-from=/usr/src/tt-rss.exclude --strip-components=1
+fi
+
 if [ ! -d /usr/src/tt-rss-feedly-theme ]; then
 	mkdir -p /usr/src/tt-rss-feedly-theme
 	tar -xf /usr/src/tt-rss-feedly-theme.tar.gz -C /usr/src/tt-rss-feedly-theme --exclude-from=/usr/src/tt-rss.exclude --strip-components=1
 fi
 
 rsync -rlD --delete --exclude-from /usr/src/tt-rss.exclude /usr/src/tt-rss/ /usr/local/tt-rss/html
+rsync -rlD --delete --exclude-from /usr/src/tt-rss.exclude /usr/src/tt-rss-nginx-xaccel/ /usr/local/tt-rss/html/plugins.local/nginx_xaccel
 rsync -rlD --delete --exclude-from /usr/src/tt-rss.exclude /usr/src/tt-rss-feedly-theme/ /usr/local/tt-rss/html/themes.local
 
 mkdir -p /usr/local/tt-rss/conf.d
