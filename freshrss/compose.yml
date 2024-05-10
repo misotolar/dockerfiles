@@ -1,0 +1,7 @@
+services:
+    freshrss:
+        build: .
+        container_name: freshrss
+        network_mode: host
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
