@@ -11,6 +11,9 @@ ADD https://github.com/openssl/openssl/releases/download/openssl-$OPENSSL_VERSIO
 ARG BROTLI_VERSION=a71f9312c2deb28875acc7bacfdd5695a111aa53
 ARG BROTLI_URL=https://github.com/google/ngx_brotli.git
 
+ARG HEADERS_VERSION=06dc0be56e5ec9f7fd814e881b066b5540a85bec
+ARG HEADERS_URL=https://github.com/openresty/headers-more-nginx-module.git
+
 ARG FANCYINDEX_VERSION=cbc0d3fca4f06414612de441399393d4b3bbb315
 ARG FANCYINDEX_URL=https://github.com/aperezdc/ngx-fancyindex.git
 
@@ -30,6 +33,7 @@ RUN set -ex; \
         musl-dev \
         openssl-dev \
         pcre-dev \
+        pcre2-dev \
         zlib-dev \
         linux-headers \
         gnupg \
@@ -57,6 +61,10 @@ RUN set -ex; \
         --config Release \
         --target brotlienc\
     ; \
+    mkdir -p /build/headers && cd /build/headers; \
+    git init; git remote add origin $HEADERS_URL; \
+    git fetch --depth 1 origin $HEADERS_VERSION; \
+    git checkout -q FETCH_HEAD; \
     mkdir -p /build/fancyindex && cd /build/fancyindex; \
     git init; git remote add origin $FANCYINDEX_URL; \
     git fetch --depth 1 origin $FANCYINDEX_VERSION; \
@@ -102,6 +110,7 @@ RUN set -ex; \
         --without-mail_imap_module \
         --without-mail_smtp_module \
         --add-dynamic-module=/build/brotli \
+        --add-dynamic-module=/build/headers \
         --add-dynamic-module=/build/fancyindex \
     ; \
     make -j ${BUILD_CORES-$(getconf _NPROCESSORS_CONF)}; \
